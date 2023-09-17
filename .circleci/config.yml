@@ -11,7 +11,7 @@ jobs:
           name: Build and test with Bazel
           command: |
             chmod 777 Tool/clang_tidy/run_clang_tidy.sh
-            bazel build //...
+            bazel build //... --config clang-tidy
             bazel test //...
 
 workflows:
