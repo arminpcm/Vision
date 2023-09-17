@@ -1,0 +1,3 @@
+# Required for bazel_clang_tidy to operate as expected
+build:clang-tidy --aspects //Tool/clang_tidy:clang_tidy.bzl%clang_tidy_aspect
+build:clang-tidy --output_groups=report

@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
     unzip \
+    clang \
+    clang-tidy \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Bazel
@@ -30,6 +32,9 @@ RUN apt-get update \
 RUN useradd -m docker
 # Allow the "docker" user to use sudo without a password
 RUN echo 'docker ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# Install what's needed for dev
+RUN apt-get install -y doxygen
 
 USER docker
 CMD ["/bin/bash"]

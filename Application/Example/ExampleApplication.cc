@@ -2,5 +2,7 @@
 #include <iostream>
 
 int main() {
-    std::cout << add(5, 6) << std::endl;
+    constexpr int var_a = 5;
+    constexpr int var_b = 6;
+    std::cout << add(var_a, var_b) << std::endl;
 }
