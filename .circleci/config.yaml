@@ -1,25 +1,29 @@
 version: 2.1
 
-executors:
-  my-executor:
-    docker:
-      - image: arminpcm/vision:latest
-    working_directory: /Vision
-
 jobs:
   build:
-    executor: my-executor
+    working_directory: /Vision
+    docker:
+      - image: "arminpcm/vision:latest"
     steps:
       - checkout
       - run:
-          name: Build and Test with Bazel
+          name: Build with Bazel
           command: |
             docker build -t arminpcm/vision:latest -f Container/Dev.dockerfile .
             docker run arminpcm/vision:latest bazel build //...
-            docker run arminpcm/vision:latest bazel test //...
+  test:
+    working_directory: /Vision
+    docker:
+      - image: "arminpcm/vision:latest"
+    steps:
+      - checkout
+      - run: docker run arminpcm/vision:latest bazel test //...
 
 workflows:
-  build-deploy:
+  build_and_test:
     jobs:
       - build
-      # Add additional jobs if needed for deployment, etc.
+      - test:
+          requires:
+            - build
