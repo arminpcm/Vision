@@ -9,16 +9,21 @@
 // the software or the use or other dealings in the software.
 
 #include <iostream>
+#include <string>
 #include <yaml-cpp/yaml.h>
 
 int main() {
     try {
+        constexpr auto FILE_NAME{"/Vision/Data/Example/ExampleYamlConfig.yaml"};
+        constexpr auto NAME{"name"};
+        constexpr auto AGE{"age"};
+        
         // Load a YAML file
-        YAML::Node config = YAML::LoadFile("Data/Example/ExampleYamlConfig.yaml");
+        YAML::Node config = YAML::LoadFile(FILE_NAME);
 
         // Access values in the YAML file
-        std::string name = config["name"].as<std::string>();
-        int age = config["age"].as<int>();
+        std::string name = config[NAME].as<std::string>();
+        int age = config[AGE].as<int>();
 
         // Print the values
         std::cout << "Name: " << name << std::endl;
