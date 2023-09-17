@@ -6,3 +6,9 @@ cc_binary(
     deps = ["//Library/Common/Example:example_library",],
     visibility = ["//visibility:public"],
 )
+
+cc_binary(
+    name = "yaml_example",
+    srcs = ["YamlExample.cc"],
+    deps = ["@yaml_cpp//:yaml-cpp"],
+)

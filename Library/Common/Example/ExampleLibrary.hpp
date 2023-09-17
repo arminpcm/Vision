@@ -8,6 +8,8 @@
 // tort or otherwise, arising from, out of or in connection with
 // the software or the use or other dealings in the software.
 
+#pragma once
+
 /// @brief A function to add two integer numbers
 /// @param a The first integer number
 /// @param b The second integer number
