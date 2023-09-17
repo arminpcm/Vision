@@ -1,5 +1,6 @@
 # Vision
 Things I enjoy working on
+[![CircleCI](https://dl.circleci.com/status-badge/img/circleci/R8zai1J9naVSzP7dj9y8sZ/MHnBLw1QFyeWRkGKppxrEg/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/circleci/R8zai1J9naVSzP7dj9y8sZ/MHnBLw1QFyeWRkGKppxrEg/tree/main)
 
 ## Supported platform
 Currently only windows is supported by the Container tools
