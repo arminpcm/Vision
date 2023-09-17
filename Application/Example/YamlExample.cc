@@ -12,6 +12,7 @@
 #include <string>
 #include <yaml-cpp/yaml.h>
 
+
 int main() {
     try {
         constexpr auto FILE_NAME{"/Vision/Data/Example/ExampleYamlConfig.yaml"};

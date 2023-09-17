@@ -12,6 +12,9 @@
 #include "Library/Common/Container/Vector.hpp"
 
 constexpr int VECTOR_SIZE = 5;
+using vision::container::Vector;
+
+
 class VectorTest : public ::testing::TestWithParam<std::pair<int, int>> {
 public:
     VectorTest(): vector(Vector<int, VECTOR_SIZE>()) {};

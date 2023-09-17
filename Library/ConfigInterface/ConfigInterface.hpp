@@ -12,7 +12,8 @@
 #include <string>
 #include <yaml-cpp/yaml.h>
 
-
+namespace vision {
+namespace config {
 class ConfigInterface {
 public:
     ConfigInterface() = delete;
@@ -32,3 +33,5 @@ private:
     YAML::Node config_;
     std::string file_name_;
 };
+}  // namespace config
+}  // namespace vision

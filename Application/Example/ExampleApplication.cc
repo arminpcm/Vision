@@ -11,6 +11,7 @@
 #include "Library/Common/Example/ExampleLibrary.hpp"
 #include <iostream>
 
+
 /// @brief The main function for the application
 int main() {
     constexpr int var_a = 5;
