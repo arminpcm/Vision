@@ -1,6 +1,8 @@
 # Vision
-Things I enjoy working on
-[![CircleCI](https://dl.circleci.com/status-badge/img/circleci/R8zai1J9naVSzP7dj9y8sZ/BeDPxP6HRJVrMaSkgKK5HV/tree/main.svg?style=svg&circle-token=b87111aef2d9b13f53dca44e0c39c3014ad591c9)](https://dl.circleci.com/status-badge/redirect/circleci/R8zai1J9naVSzP7dj9y8sZ/BeDPxP6HRJVrMaSkgKK5HV/tree/main)
+Build Status:
+
+
+[![CircleCI](https://dl.circleci.com/status-badge/img/circleci/R8zai1J9naVSzP7dj9y8sZ/BeDPxP6HRJVrMaSkgKK5HV/tree/main.svg?style=shield&circle-token=b87111aef2d9b13f53dca44e0c39c3014ad591c9)](https://dl.circleci.com/status-badge/redirect/circleci/R8zai1J9naVSzP7dj9y8sZ/BeDPxP6HRJVrMaSkgKK5HV/tree/main)
 
 ## Supported platform
 Currently only windows is supported by the Container tools
