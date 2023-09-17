@@ -4,7 +4,7 @@ executors:
   my-executor:
     docker:
       - image: arminpcm/vision:latest
-    working_directory: /workspace
+    working_directory: /Vision
 
 jobs:
   build:
@@ -17,7 +17,7 @@ jobs:
             docker build -t arminpcm/vision:latest -f Container/Dev.dockerfile .
             docker run arminpcm/vision:latest bazel build //...
             docker run arminpcm/vision:latest bazel test //...
-            
+
 workflows:
   version: 2
   build-deploy:
