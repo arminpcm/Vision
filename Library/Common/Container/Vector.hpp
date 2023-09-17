@@ -13,6 +13,8 @@
 #include <array>
 #include <iostream>
 
+namespace vision {
+namespace container {
 
 /// @brief Statically sized vector based on std::array
 /// @tparam T Type of the data stored in the vector
@@ -151,3 +153,5 @@ private:
     /// @brief The underlying std::array holding elements of the vector
     Container data_;
 };
+}  // namespace container
+}  // namespace vision

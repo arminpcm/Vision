@@ -11,7 +11,8 @@
 #include "Library/ConfigInterfaces/ConfigInterface.hpp"
 #include "ConfigInterface.hpp"
 
-
+namespace vision {
+namespace config {
 ConfigInterface::ConfigInterface(const std::string &file_name) : file_name_(file_name) { };
 
 
@@ -23,3 +24,5 @@ YAML::Node ConfigInterface::getConfig() const
 {
     return config_;
 }
+}  // namespace config
+}  // namespace vision
