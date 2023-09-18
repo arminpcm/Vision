@@ -5,7 +5,8 @@ Checks: >
     cppcoreguidelines-*,
     google-*,
     performance-*,
+    -*pb.h,
 
-HeaderFilterRegex: ".*"
+HeaderFilterRegex: "^(?!.*\\.pb\\.h).*"
 
 WarningsAsErrors: "*"
