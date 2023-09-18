@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
+#include <utility>
 
 namespace vision {
 namespace container {
@@ -21,13 +22,13 @@ namespace container {
 /// @tparam Size Size of the vector
 template <typename T, std::size_t Size>
 class Vector {
-public:
+ public:
     /// @brief Defining container as a sized array
     using Container = std::array<T, Size>;
 
     /// @brief Iterator class for Vector to help iterate over items
     class Iterator {
-    public:
+     public:
         /// @brief Explicit single parameter constructor
         /// @param ptr Iterator to initialize with
         explicit Iterator(typename Container::iterator ptr) : ptr_(ptr) {}
@@ -66,7 +67,7 @@ public:
             return ptr_ == other.ptr_;
         }
 
-    private:
+     private:
         /// @brief Underlying pointer
         typename Container::iterator ptr_;
     };
@@ -144,12 +145,12 @@ public:
         return Iterator(data_.begin());
     }
 
-    /// @brief Returns an iterator referencing to the last element 
+    /// @brief Returns an iterator referencing to the last element
     Iterator end() {
         return Iterator(data_.end());
     }
 
-private:
+ private:
     /// @brief The underlying std::array holding elements of the vector
     Container data_;
 };

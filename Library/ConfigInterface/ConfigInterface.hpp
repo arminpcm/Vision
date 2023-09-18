@@ -8,11 +8,13 @@
 // tort or otherwise, arising from, out of or in connection with
 // the software or the use or other dealings in the software.
 
+#pragma once
+
+#include <google/protobuf/util/json_util.h>
+
 #include <stdexcept>
 #include <iostream>
 #include <string>
-
-#include <google/protobuf/util/json_util.h>
 
 namespace vision {
 namespace config {
@@ -21,7 +23,7 @@ namespace config {
 /// @tparam T The struct used to define config
 template <typename T>
 class ConfigInterface {
-public:
+ public:
     /// @brief deleted default constructor
     ConfigInterface() = delete;
 
@@ -29,7 +31,7 @@ public:
     /// @param file_name The path to the config file
     explicit ConfigInterface(const std::string& file_name) noexcept : file_name_(file_name) {
         LoadConfig();
-    };
+    }
 
     /// @brief Default destructor
     ~ConfigInterface() = default;
@@ -55,26 +57,28 @@ public:
         // Parse the json_string into protbuf struct
         google::protobuf::util::JsonParseOptions options;
         JsonStringToMessage(file_contents, &config_object_, options);
-    };
+    }
 
     /// @brief Serializes the config
     /// @return Returns serialized representation of the config
     T GetConfigObject() {
         return config_object_;
-    };
+    }
 
-    // Deleted move and copy semantics 
-    ConfigInterface(ConfigInterface& other) = delete;
-    ConfigInterface(ConfigInterface&& other) = delete;
-    ConfigInterface operator=(ConfigInterface& other) = delete;
-    ConfigInterface operator=(ConfigInterface&& other) = delete;
+    // Deleted move and copy semantics
+    ConfigInterface(const ConfigInterface& other) = delete;
+    ConfigInterface(const ConfigInterface&& other) = delete;
+    ConfigInterface operator=(const ConfigInterface& other) = delete;
+    ConfigInterface operator=(const ConfigInterface&& other) = delete;
 
-protected:
+ protected:
     /// @brief Protected method defined to provide access to config_ object for children
     /// @return Representing the config
-    T GetConfig() const { return config_object_; };
+    T GetConfig() const {
+        return config_object_;
+    }
 
-private:
+ private:
     T config_object_;
     std::string file_name_;
 };

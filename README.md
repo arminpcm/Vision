@@ -51,3 +51,8 @@ Or
 ```
 bazel-bin/Application/Example/example_application
 ```
+
+Make sure you are running cpplint on your new code:
+```
+cpplint --quiet --counting=detailed --linelength=120 --recursive <PATH>
+```

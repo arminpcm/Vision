@@ -8,9 +8,10 @@
 // tort or otherwise, arising from, out of or in connection with
 // the software or the use or other dealings in the software.
 
+#include <yaml-cpp/yaml.h>
+
 #include <iostream>
 #include <string>
-#include <yaml-cpp/yaml.h>
 
 
 int main() {
@@ -18,7 +19,7 @@ int main() {
         constexpr auto FILE_NAME{"/Vision/Data/Example/ExampleYamlConfig.yaml"};
         constexpr auto NAME{"name"};
         constexpr auto AGE{"age"};
-        
+
         // Load a YAML file
         YAML::Node config = YAML::LoadFile(FILE_NAME);
 

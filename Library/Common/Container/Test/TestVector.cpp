@@ -16,11 +16,11 @@ using vision::container::Vector;
 
 
 class VectorTest : public ::testing::TestWithParam<std::pair<int, int>> {
-public:
-    VectorTest(): vector(Vector<int, VECTOR_SIZE>()) {};
+ public:
+    VectorTest(): vector(Vector<int, VECTOR_SIZE>()) {}
     Vector<int, VECTOR_SIZE> vector;
 
-protected:
+ protected:
     void SetUp() override {
         int initialValue = GetParam().first;
         vector = Vector<int, VECTOR_SIZE>(initialValue);
@@ -88,9 +88,9 @@ TEST_P(VectorTest, Iterator) {
 
 
 INSTANTIATE_TEST_SUITE_P(InitialValues, VectorTest, ::testing::Values(
-    std::make_pair(0, 0), // Initial value is 0, expected value is 0
-    std::make_pair(1, 1), // Initial value is 1, expected value is 1
-    std::make_pair(-1, -1) // Initial value is -1, expected value is -1
+    std::make_pair(0, 0),   // Initial value is 0, expected value is 0
+    std::make_pair(1, 1),   // Initial value is 1, expected value is 1
+    std::make_pair(-1, -1)  // Initial value is -1, expected value is -1
 ));
 
 

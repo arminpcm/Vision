@@ -8,8 +8,9 @@
 // tort or otherwise, arising from, out of or in connection with
 // the software or the use or other dealings in the software.
 
-#include "Library/Common/Example/ExampleLibrary.hpp"
 #include <iostream>
+
+#include "Library/Common/Example/ExampleLibrary.hpp"
 
 
 /// @brief The main function for the application
