@@ -9,16 +9,14 @@
 // the software or the use or other dealings in the software.
 
 #include <iostream>
-#include <fstream>
-#include <sstream> // Include the <sstream> header
+
 #include "Library/ConfigInterface/proto/person.pb.h"
 #include "Library/ConfigInterface/ConfigInterface.hpp"
 
 constexpr auto FILE_NAME = "/Vision/Data/Example/ExampleData.txt";
 using vision::config::ConfigInterface;
 
-int main()
-{
+int main() {
     // Create a Config Interface Object
     ConfigInterface<example::Person> config_loader(FILE_NAME);
 
