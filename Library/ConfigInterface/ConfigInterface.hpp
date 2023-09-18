@@ -12,6 +12,8 @@
 #include <iostream>
 #include <string>
 
+#include <google/protobuf/util/json_util.h>
+
 namespace vision {
 namespace config {
 
@@ -29,16 +31,37 @@ public:
         LoadConfig();
     };
 
-    /// @brief Default destructor defined as virtual to allow inheritence
-    virtual ~ConfigInterface() = default;
+    /// @brief Default destructor
+    ~ConfigInterface() = default;
 
     /// @brief Loads config
-    virtual void LoadConfig() = 0;
+    void LoadConfig() {
+        // Open the file
+        std::ifstream file_stream(file_name_, std::ios::in);
+
+        // Check if the file is open
+        if (!file_stream.is_open()) {
+            std::cerr << "Error: Could not open the file." << std::endl;
+            return;
+        }
+
+        // Read the file into a string
+        std::string file_contents((std::istreambuf_iterator<char>(file_stream)),
+                                std::istreambuf_iterator<char>());
+
+        // Close the file
+        file_stream.close();
+
+        // Parse the json_string into protbuf struct
+        google::protobuf::util::JsonParseOptions options;
+        JsonStringToMessage(file_contents, &config_object_, options);
+    };
 
     /// @brief Serializes the config
     /// @return Returns serialized representation of the config
-    /// @throw Throws std::runtime if the config_ object is empty
-    T GetConfigObject() = 0;
+    T GetConfigObject() {
+        return config_object_;
+    };
 
     // Deleted move and copy semantics 
     ConfigInterface(ConfigInterface& other) = delete;
