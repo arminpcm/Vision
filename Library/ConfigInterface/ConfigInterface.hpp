@@ -11,7 +11,6 @@
 #include <stdexcept>
 #include <iostream>
 #include <string>
-#include <yaml-cpp/yaml.h>
 
 namespace vision {
 namespace config {
@@ -25,7 +24,7 @@ public:
     ConfigInterface() = delete;
 
     /// @brief Constructor loading config given a filename
-    /// @param file_name The path to the YAML file
+    /// @param file_name The path to the config file
     explicit ConfigInterface(const std::string& file_name) noexcept : file_name_(file_name) {
         LoadConfig();
     };
@@ -34,23 +33,12 @@ public:
     virtual ~ConfigInterface() = default;
 
     /// @brief Loads config
-    virtual void LoadConfig() {
-        try {
-            config_ = YAML::LoadFile(file_name_);
-        } catch (const YAML::Exception& e) {
-            std::cerr << "Error parsing YAML: " << e.what() << std::endl;
-        }
-    };
+    virtual void LoadConfig() = 0;
 
     /// @brief Serializes the config
     /// @return Returns serialized representation of the config
     /// @throw Throws std::runtime if the config_ object is empty
-    T GetConfigObject() {
-        if (config_.IsNull()) {
-            throw std::runtime_error("Cannot serialize an empty config");
-        }
-        return config_object_.Serialize(config_);
-    }
+    T GetConfigObject() = 0;
 
     // Deleted move and copy semantics 
     ConfigInterface(ConfigInterface& other) = delete;
@@ -60,11 +48,10 @@ public:
 
 protected:
     /// @brief Protected method defined to provide access to config_ object for children
-    /// @return YAML::Node representing the config
-    YAML::Node GetConfig() const { return config_; };
+    /// @return Representing the config
+    T GetConfig() const { return config_object_; };
 
 private:
-    YAML::Node config_;
     T config_object_;
     std::string file_name_;
 };
