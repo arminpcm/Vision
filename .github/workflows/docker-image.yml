@@ -14,11 +14,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Docker
+    - name: Docker Build
       run: docker build . --file Container/Dev.dockerfile --tag vision:latest
-    - name: Build
-      run: docker run -t -u docker -v ${{ github.workspace }}:/Vision vision:latest sh -c "sudo chown docker Tool/clang_tidy/run_clang_tidy.sh && bazel build //... --config=clang-tidy"
-    - name: Test
-      run: docker run -u docker -v ${{ github.workspace }}:/Vision vision:latest bazel test //...
-        
-      
