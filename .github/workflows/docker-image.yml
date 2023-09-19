@@ -17,8 +17,8 @@ jobs:
     - name: Docker
       run: docker build . --file Container/Dev.dockerfile --tag vision:latest
     - name: Build
-      run: docker run -u root -v ${{ github.workspace }}:/Vision vision:latest bazel build //... --config clang-tidy
+      run: docker run -u docker -v ${{ github.workspace }}:/Vision vision:latest bazel build //... --config clang-tidy
     - name: Test
-      run: docker run -u root -v ${{ github.workspace }}:/Vision vision:latest bazel test //...
+      run: docker run -u docker -v ${{ github.workspace }}:/Vision vision:latest bazel test //...
         
       
