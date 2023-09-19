@@ -70,3 +70,9 @@ http_archive(
 )
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 protobuf_deps()
+
+http_archive(
+    name = "gflags",
+    urls = ["https://github.com/gflags/gflags/archive/v2.2.2.tar.gz"],
+    strip_prefix = "gflags-2.2.2",
+)
