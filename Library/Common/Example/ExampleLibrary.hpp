@@ -14,6 +14,4 @@
 /// @param a The first integer number
 /// @param b The second integer number
 /// @return sum of the two input arguments
-int add(int a, int b) {
-    return a + b;
-}
+int add(int a, int b);

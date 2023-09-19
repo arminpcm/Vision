@@ -30,41 +30,13 @@ class ConfigInterface {
 
     /// @brief Constructor loading config given a filename
     /// @param file_name The path to the config file
-    explicit ConfigInterface(const std::string& file_name) noexcept : file_name_(file_name) {
-        LoadConfig();
-    }
+    explicit ConfigInterface(const std::string& file_name) noexcept;
 
     /// @brief Default destructor
     ~ConfigInterface() = default;
 
     /// @brief Loads config
-    void LoadConfig() {
-        // Open the file
-        std::ifstream file_stream(file_name_, std::ios::in);
-
-        // Check if the file is open
-        if (!file_stream.is_open()) {
-            std::cerr << "Error: Could not open the file." << std::endl;
-            return;
-        }
-
-        // Read the file into a string
-        std::string file_contents((std::istreambuf_iterator<char>(file_stream)),
-                                std::istreambuf_iterator<char>());
-
-        // Close the file
-        file_stream.close();
-
-        // Parse the json_string into protbuf struct
-        google::protobuf::util::JsonParseOptions options;
-        JsonStringToMessage(file_contents, &config_object_, options);
-    }
-
-    /// @brief Serializes the config
-    /// @return Returns serialized representation of the config
-    T GetConfigObject() {
-        return config_object_;
-    }
+    void LoadConfig();
 
     // Deleted move and copy semantics
     ConfigInterface(const ConfigInterface& other) = delete;
@@ -72,16 +44,16 @@ class ConfigInterface {
     ConfigInterface operator=(const ConfigInterface& other) = delete;
     ConfigInterface operator=(const ConfigInterface&& other) = delete;
 
- protected:
     /// @brief Protected method defined to provide access to config_ object for children
     /// @return Representing the config
-    T GetConfig() const {
-        return config_object_;
-    }
+    T GetConfig() const;
 
  private:
     T config_object_;
     std::string file_name_;
 };
+
 }  // namespace config
 }  // namespace vision
+
+#include "Library/ConfigInterface/ConfigInterface.cc"

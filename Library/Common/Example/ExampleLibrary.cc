@@ -8,22 +8,8 @@
 // tort or otherwise, arising from, out of or in connection with
 // the software or the use or other dealings in the software.
 
-#include <iostream>
+#include "Library/Common/Example/ExampleLibrary.hpp"
 
-#include "Library/ConfigInterface/proto/person.pb.h"
-#include "Library/ConfigInterface/ConfigInterface.hpp"
-
-constexpr auto FILE_NAME = "/Vision/Data/Example/ExampleData.txt";
-
-using vision::config::ConfigInterface;
-
-int main() {
-    // Create a Config Interface Object
-    ConfigInterface<example::Person> config_loader(FILE_NAME);
-
-    auto person = config_loader.GetConfig();
-    // Print the values of person
-    std::cout << person.id() << ", " << person.name() << ", " << person.email() << std::endl;
-
-  return 0;
+int add(int a, int b) {
+    return a + b;
 }

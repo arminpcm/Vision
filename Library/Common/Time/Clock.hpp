@@ -15,64 +15,42 @@
 #include <thread>
 #include <stdexcept>
 
-
+namespace vision {
+namespace time {
 class Clock {
  private:
     uint64_t start_time_;
 
  public:
     /// @brief Constructor to initialize the start time
-    Clock() : start_time_(CurrentTimeNanoseconds()) {}
+    Clock();
     ~Clock() = default;
 
     /// @brief Get the current time in nanoseconds since epoch
     /// @return The curring time in nanoseconds since epoch
-    uint64_t CurrentTimeNanoseconds() const {
-        auto now = std::chrono::high_resolution_clock::now();
-        return std::chrono::time_point_cast<std::chrono::nanoseconds>(now).time_since_epoch().count();
-    }
+    uint64_t CurrentTimeNanoseconds() const;
 
     /// @brief Sleep for the specified number of nanoseconds
     /// @param nanoseconds Time to sleep for
-    void SleepForNanoseconds(uint64_t nanoseconds) {
-        std::this_thread::sleep_for(std::chrono::nanoseconds(nanoseconds));
-    }
+    void SleepForNanoseconds(uint64_t nanoseconds);
 
     /// @brief Sleep until a specific time in nanoseconds since epoch
     /// @param nanoseconds Time to wake up at
-    void SleepUntilNanoseconds(uint64_t nanoseconds) {
-        uint64_t currentNanoseconds = CurrentTimeNanoseconds();
-        if (nanoseconds > currentNanoseconds) {
-            uint64_t sleepDuration = nanoseconds - currentNanoseconds;
-            std::this_thread::sleep_for(std::chrono::nanoseconds(sleepDuration));
-        } else {
-            throw std::runtime_error("Cannot sleep until a time in the past");
-        }
-    }
+    void SleepUntilNanoseconds(uint64_t nanoseconds);
 
     /// @brief Get the elapsed time in nanoseconds
     /// @return The elapsed time since the Clock was started or reset
-    uint64_t ElapsedTime() const {
-        uint64_t currentTime = CurrentTimeNanoseconds();
-        return currentTime - start_time_;
-    }
+    uint64_t ElapsedTime() const;
 
     /// @brief Reset the start time
-    void Reset() {
-        start_time_ = CurrentTimeNanoseconds();
-    }
+    void Reset();
 
     /// @brief Reset the start time
-    void Start() {
-        start_time_ = CurrentTimeNanoseconds();
-    }
+    void Start();
 
     /// @brief Stop the start time
     /// @return Returns the elapsed time
-    uint64_t Stop() const {
-        uint64_t currentTime = CurrentTimeNanoseconds();
-        return currentTime - start_time_;
-    }
+    uint64_t Stop() const;
 
     // Deleted move and copy semantics
     Clock(const Clock& other) = delete;
@@ -80,3 +58,6 @@ class Clock {
     Clock operator=(const Clock& other) = delete;
     Clock operator=(const Clock&& other) = delete;
 };
+
+}  // namespace time
+}  // namespace vision
