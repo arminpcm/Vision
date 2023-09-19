@@ -8,9 +8,6 @@
 // tort or otherwise, arising from, out of or in connection with
 // the software or the use or other dealings in the software.
 
-//#include "Library/ConfigInterface/ConfigInterface.hpp"
-//#include "Library/ConfigInterface/proto/person.pb.h"
-
 #include <google/protobuf/util/json_util.h>
 #include <iostream>
 #include <fstream>

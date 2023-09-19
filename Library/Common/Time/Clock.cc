@@ -9,12 +9,11 @@
 // the software or the use or other dealings in the software.
 
 #include "Library/Common/Time/Clock.hpp"
-#include "Clock.hpp"
 
 using vision::time::Clock;
 
 Clock::Clock() : start_time_(Clock::CurrentTimeNanoseconds()) {
-};
+}
 
 uint64_t Clock::CurrentTimeNanoseconds() const {
     auto now = std::chrono::high_resolution_clock::now();

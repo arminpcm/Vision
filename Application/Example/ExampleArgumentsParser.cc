@@ -8,8 +8,9 @@
 // tort or otherwise, arising from, out of or in connection with
 // the software or the use or other dealings in the software.
 
-#include <iostream>
 #include <gflags/gflags.h>
+
+#include <iostream>
 
 DEFINE_string(topic_name, "", "Name of the topic");  // NOLINT
 DEFINE_int32(queue_size, 0, "Size of the queue");    // NOLINT

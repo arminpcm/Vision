@@ -156,3 +156,5 @@ class Vector {
 };
 }  // namespace container
 }  // namespace vision
+
+#include "Library/Common/Container/Vector.hpp"
