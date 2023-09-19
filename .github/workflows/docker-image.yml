@@ -1,0 +1,24 @@
+name: Docker and Bazel CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Docker
+      run: docker build . --file Container/Dev.dockerfile --tag vision:latest
+    - name: Build
+      run: docker run -v ${{ github.workspace }}:/Vision vision:latest bazel build //... --config clang-tidy
+    - name: Test
+      run: docker run -v ${{ github.workspace }}:/Vision vision:latest bazel test //...
+        
+      
