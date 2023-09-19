@@ -55,3 +55,5 @@ class ConfigInterface {
 
 }  // namespace config
 }  // namespace vision
+
+#include "Library/ConfigInterface/ConfigInterface.cc"

@@ -14,6 +14,7 @@
 #include "Library/ConfigInterface/ConfigInterface.hpp"
 
 constexpr auto FILE_NAME = "/Vision/Data/Example/ExampleData.txt";
+
 using vision::config::ConfigInterface;
 
 int main() {
