@@ -21,9 +21,9 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get update && apt-get install -y openjdk-11-jdk wget git && rm -rf /var/lib/apt/lists/*
 
 # Install Bazel
-RUN wget https://github.com/bazelbuild/bazel/releases/download/4.2.1/bazel_4.2.1-linux-x86_64.deb
-RUN dpkg -i bazel_4.2.1-linux-x86_64.deb \
-    && rm bazel_4.2.1-linux-x86_64.deb
+RUN wget https://github.com/bazelbuild/bazel/releases/download/6.0.0/bazel_6.0.0-linux-x86_64.deb
+RUN dpkg -i bazel_6.0.0-linux-x86_64.deb \
+    && rm bazel_6.0.0-linux-x86_64.deb
 
 RUN apt-get update \
  && apt-get install -y sudo

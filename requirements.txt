@@ -1,0 +1,4 @@
+numpy==1.26.0
+# The following is commented out to reduce the CI build time
+# torch==1.13.1
+# torchvision==0.14.1+cu117
