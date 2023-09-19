@@ -21,3 +21,11 @@ cc_binary(
         "//Library/ConfigInterface:config_interface",
     ],
 )
+
+cc_binary(
+    name = "example_parser",
+    srcs = ["ExampleArgumentsParser.cc"],
+    deps = [
+        "@gflags"
+    ],
+)
