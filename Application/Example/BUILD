@@ -8,7 +8,7 @@ cc_binary(
 )
 
 cc_binary(
-    name = "yaml_example",
+    name = "example_yaml",
     srcs = ["YamlExample.cc"],
     deps = ["@yaml_cpp//:yaml-cpp"],
 )
