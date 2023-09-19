@@ -16,11 +16,18 @@
 constexpr auto FILE_NAME = "/Vision/Data/Example/ExampleData.txt";
 using vision::config::ConfigInterface;
 
+namespace vision {
+namespace config {
+// Explicit template instantiation for the types you plan to use.
+template class ConfigInterface<example::Person>;
+}  // namespace config
+}  // namespace vision
+
 int main() {
     // Create a Config Interface Object
     ConfigInterface<example::Person> config_loader(FILE_NAME);
 
-    auto person = config_loader.GetConfigObject();
+    auto person = config_loader.GetConfig();
     // Print the values of person
     std::cout << person.id() << ", " << person.name() << ", " << person.email() << std::endl;
 
