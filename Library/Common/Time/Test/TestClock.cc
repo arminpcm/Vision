@@ -13,7 +13,6 @@
 
 constexpr uint64_t OneMillisecond = 1000000;
 constexpr uint64_t OneSecond = 1000000000;
-constexpr uint64_t TenMicroSecond = 10000;
 constexpr uint64_t FiveHundredMicroSecond = 500000;
 
 // Test fixture for the Clock class
