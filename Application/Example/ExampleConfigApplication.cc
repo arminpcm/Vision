@@ -16,13 +16,6 @@
 constexpr auto FILE_NAME = "/Vision/Data/Example/ExampleData.txt";
 using vision::config::ConfigInterface;
 
-namespace vision {
-namespace config {
-// Explicit template instantiation for the types you plan to use.
-template class ConfigInterface<example::Person>;
-}  // namespace config
-}  // namespace vision
-
 int main() {
     // Create a Config Interface Object
     ConfigInterface<example::Person> config_loader(FILE_NAME);

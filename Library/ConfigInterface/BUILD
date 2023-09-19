@@ -6,6 +6,9 @@ cc_library(
         "ConfigInterface.hpp",
         "ConfigInterface.cc"
     ],
-    deps = ["@com_google_protobuf//:protobuf",],
+    srcs = [
+        "ConfigInterface.cc"
+    ],
+    deps = ["@com_google_protobuf//:protobuf", "//Library/ConfigInterface/proto:person_cc_proto",],
     visibility = ["//visibility:public"],
 )
