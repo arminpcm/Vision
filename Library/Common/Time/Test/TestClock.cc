@@ -11,6 +11,8 @@
 #include <gtest/gtest.h>
 #include "Library/Common/Time/Clock.hpp" // Include the header file for your Clock class
 
+using vision::time::Clock;
+
 constexpr uint64_t OneMillisecond = 1000000;
 constexpr uint64_t OneSecond = 1000000000;
 constexpr uint64_t FiveHundredMicroSecond = 500000;

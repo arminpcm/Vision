@@ -8,10 +8,8 @@
 // tort or otherwise, arising from, out of or in connection with
 // the software or the use or other dealings in the software.
 
-#pragma once
+#include "Library/Common/Example/ExampleLibrary.hpp"
 
-/// @brief A function to add two integer numbers
-/// @param a The first integer number
-/// @param b The second integer number
-/// @return sum of the two input arguments
-int add(int a, int b);
+int add(int a, int b) {
+    return a + b;
+}
