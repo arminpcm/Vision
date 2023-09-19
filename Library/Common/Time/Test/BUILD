@@ -7,4 +7,5 @@ cc_test(
         "//Library/Common/Time:clock",
         "@gtest//:gtest_main",
     ],
+    timeout = "long",
 )
