@@ -4,7 +4,9 @@ cc_library(
     name = "vector",
     hdrs = [
         "Vector.hpp",
-        "Vector.cc"
+        "Vector.h",
+        "Vector.cc",
     ],
+    srcs = ["Vector.cc",],
     visibility = ["//visibility:public"],
 )

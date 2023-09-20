@@ -7,87 +7,107 @@
 // damages or other liability, whether in an action of contract,
 // tort or otherwise, arising from, out of or in connection with
 // the software or the use or other dealings in the software.
-#pragma once
+
+#include "Library/Common/Container/Vector.h"
 
 #include <algorithm>
 #include <array>
 #include <iostream>
 #include <utility>
 
-using vision::container::Vector;
+namespace vision {
+namespace container {
 
-explicit Vector::Iterator::Iterator(typename Container::iterator ptr) : ptr_(ptr) {}
+template <typename T, std::size_t Size>
+Vector<T, Size>::Iterator::Iterator(typename Container::iterator ptr) : ptr_(ptr) {}
 
-Vector::Iterator::Iterator& operator++() {
+template <typename T, std::size_t Size>
+typename Vector<T, Size>::Iterator& Vector<T, Size>::Iterator::operator++() {
     ++ptr_;
     return *this;
 }
 
-Vector::Iterator::Iterator& operator--() {
+template <typename T, std::size_t Size>
+typename Vector<T, Size>::Iterator& Vector<T, Size>::Iterator::operator--() {
     --ptr_;
     return *this;
 }
 
-T& Vector::Iterator::operator*() {
+template <typename T, std::size_t Size>
+T& Vector<T, Size>::Iterator::operator*() {
     return *ptr_;
 }
 
-bool Vector::Iterator::operator!=(const Vector::Iterator::Iterator& other) const {
+template <typename T, std::size_t Size>
+bool Vector<T, Size>::Iterator::operator!=(const Vector<T, Size>::Iterator& other) const {
     return ptr_ != other.ptr_;
 }
 
-bool Vector::Iterator::operator==(const Vector::Iterator::Iterator& other) const {
+template <typename T, std::size_t Size>
+bool Vector<T, Size>::Iterator::operator==(const Vector<T, Size>::Iterator& other) const {
     return ptr_ == other.ptr_;
 }
 
-
-explicit Vector::Iterator::Vector(const T& value) {
+template <typename T, std::size_t Size>
+Vector<T, Size>::Vector(const T& value) {
     data_.fill(value);
 }
 
-Vector::Iterator::Vector(const Vector::Iterator::Vector& other) {
+template <typename T, std::size_t Size>
+Vector<T, Size>::Vector(const Vector<T, Size>& other) {
     std::copy(other.data_.begin(), other.data_.end(), data_.begin());
 }
 
-Vector& Vector::Iterator::operator=(const Vector& other) {
+template <typename T, std::size_t Size>
+Vector<T, Size>& Vector<T, Size>::operator=(const Vector<T, Size>& other) {
     if (this != &other) {
         std::copy(other.data_.begin(), other.data_.end(), data_.begin());
     }
     return *this;
 }
 
-Vector::Vector(Vector::Vector&& other) noexcept : data_(std::move(other.data_)) {}
+template <typename T, std::size_t Size>
+Vector<T, Size>::Vector(Vector<T, Size>&& other) noexcept : data_(std::move(other.data_)) {
+}
 
-Vector::Vector& operator=(Vector::Vector&& other) noexcept {
+template <typename T, std::size_t Size>
+Vector<T, Size>& Vector<T, Size>::operator=(Vector<T, Size>&& other) noexcept {
     if (this != &other) {
         data_ = std::move(other.data_);
     }
     return *this;
 }
 
-T& Vector::operator[](std::size_t index) {
+template <typename T, std::size_t Size>
+T& Vector<T, Size>::operator[](std::size_t index) {
     if (index >= Size) {
         throw std::out_of_range("Index out of range");
     }
     return data_[index];
 }
 
-const T& Vector::operator[](std::size_t index) const {
+template <typename T, std::size_t Size>
+const T& Vector<T, Size>::operator[](std::size_t index) const {
     if (index >= Size) {
         throw std::out_of_range("Index out of range");
     }
     return data_[index];
 }
 
-
-std::size_t Vector::size() const {
+template <typename T, std::size_t Size>
+std::size_t Vector<T, Size>::size() const {
     return Size;
 }
 
-Iterator Vector::begin() {
-    return Vector::Iterator(data_.begin());
+template <typename T, std::size_t Size>
+typename Vector<T, Size>::Iterator Vector<T, Size>::begin() {
+    return Vector<T, Size>::Iterator(data_.begin());
 }
 
-Vector::Iterator Vector::end() {
-    return Vector::Iterator(data_.end());
+template <typename T, std::size_t Size>
+typename Vector<T, Size>::Iterator Vector<T, Size>::end() {
+    return Vector<T, Size>::Iterator(data_.end());
 }
+
+}  // namespace container
+}  // namespace vision
