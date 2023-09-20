@@ -10,5 +10,5 @@
 
 #pragma once
 
-#include "Library/Common/Container/Vector.h"
-#include "Library/Common/Container/Vector.cc"
+#include "Library/Component/BaseComponent.h"
+#include "Library/Component/BaseComponent.cc"
