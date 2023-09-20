@@ -24,9 +24,9 @@ namespace component {
 using vision::config::ConfigInterface;
 
 template <typename ConfigType, typename StateType>
-BaseComponent<ConfigType, StateType>::BaseComponent(int argc, char* argv[]) {
+BaseComponent<ConfigType, StateType>::BaseComponent(int argc, const std::shared_ptr<char**>& argv) {
     // Initialize gflags
-    gflags::ParseCommandLineFlags(&argc, &argv, true);
+    gflags::ParseCommandLineFlags(&argc, &*argv.get(), true);
     // Check if the required flags are provided
     if (FLAGS_config_path.empty()) {
         std::cerr << "Error: config_path flag is required." << std::endl;

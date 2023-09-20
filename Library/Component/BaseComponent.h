@@ -12,6 +12,8 @@
 
 #include <gflags/gflags.h>
 
+#include <array>
+
 #include "Library/ConfigInterface/ConfigInterface.hpp"
 #include "Library/Common/Time/Clock.hpp"
 #include "Library/ConfigInterface/ConfigInterface.hpp"
@@ -29,7 +31,7 @@ class BaseComponent {
    /// @brief Constructor that reads commandline argument and loads the config file
    /// @param argc the argument count passed from main function
    /// @param argv the argument vector passed from the main function
-   BaseComponent(int argc, char* argv[]);
+   BaseComponent(int argc, const std::shared_ptr<char**> &argv);
 
    /// @brief The virtual destructor
    virtual ~BaseComponent();
@@ -55,7 +57,7 @@ class BaseComponent {
    StateType state_;
    Clock clock_;
    std::thread update_thread_;
-   std::atomic<bool> exit_requested_ = false;
+   std::atomic<bool> exit_requested_ = {false};
 
  protected:
    ConfigType& GetConfig();
