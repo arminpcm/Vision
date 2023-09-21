@@ -77,6 +77,17 @@ http_archive(
     strip_prefix = "gflags-2.2.2",
 )
 
+load(
+    "@bazel_tools//tools/build_defs/repo:git.bzl",
+    "git_repository",
+)
+
+git_repository(
+       name = "bazel_clang_tidy",
+       commit = "783aa523aafb4a6798a538c61e700b6ed27975a7",
+       remote = "https://github.com/erenon/bazel_clang_tidy.git",
+)
+
 # Add hermetic pythong tooling
 http_archive(
     name = "rules_python",

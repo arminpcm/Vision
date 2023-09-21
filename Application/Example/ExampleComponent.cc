@@ -8,15 +8,16 @@
 // tort or otherwise, arising from, out of or in connection with
 // the software or the use or other dealings in the software.
 
-#include "Application/Example/ExampleComponentLibrary/ExampleComponentLibrary.h"
-#include "Library/Component/Component.h"
-#include "Library/Component/ComponentImpl.h"
+#include "Application/Example/ExampleComponentLibrary/ExampleComponentLibrary.hpp"
+#include "Library/Component/Component.hpp"
+#include "Library/Component/ComponentImpl.hpp"
 
 using vision::component::Component;
 
 constexpr float FREQUENCY = 10.0;
 
 int main(int argc, char* argv[]) {
+    try {
     std::shared_ptr<char**> shared_argv(&argv);
     Component<example::Person, uint8_t> example_component(argc,
                                                           shared_argv,
@@ -24,4 +25,7 @@ int main(int argc, char* argv[]) {
                                                           vision::component::OnUpdate);
 
     example_component.Run(FREQUENCY);
+    } catch (...) {
+        std::cout << "An exception happened!" << std::endl;
+    }
 }

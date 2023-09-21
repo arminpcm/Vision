@@ -64,3 +64,84 @@ And this would print:
 Name: John Doe
 Age: 30
 ```
+
+## ExampleComponent.cc
+# Component Class Usage Guide
+The [Component](../../Library/Component/Component.hpp) library is a powerful tool for creating and running components within your project. This guide will walk you through the steps to use the `Component` class and provides an example of how to run it.
+
+The `Component` class provides a framework for creating and running components. Here's how to use it:
+
+1. Define `OnInit` and `OnUpdate` functions to be registered with the component:
+
+Understanding OnInit and OnUpdate Functions
+- OnInit Function
+The OnInit function is a critical part of your component's initialization process. It is called during the component's startup and is responsible for setting up the initial state and performing any necessary setup tasks. Here's a breakdown of its parameters and significance:
+
+**Parameters:**
+
+`std::shared_ptr<ConfigType>` config: This parameter typically represents the configuration data needed for your component. It's shared among various parts of your component code.
+`std::shared_ptr<StaticType>&` state: This parameter is a reference to a shared state variable. It allows the OnInit function to initialize or modify the state that your component will use during its execution.
+Significance:
+
+Configuration Loading: You can use the config parameter to load configuration settings required for your component's behavior. For example, reading settings from a configuration file.
+State Initialization: The state parameter allows you to initialize the state of your component. This state can be used to keep track of component-specific data or control its behavior during the OnUpdate function.
+
+- OnUpdate Function
+The OnUpdate function is called repeatedly during the execution loop of your component. It's where the core logic of your component resides, and it's responsible for processing data, performing computations, and making decisions based on the input data. Here's a closer look at its parameters and significance:
+
+**Parameters:**
+
+`std::shared_ptr<ConfigType>` config: Just like in OnInit, this parameter represents the configuration data needed for your component. It allows you to access configuration settings during the component's execution.
+`std::shared_ptr<StateType>&` state: Similar to OnInit, this parameter represents the shared state variable. It can be used to maintain the state of your component across multiple update cycles.
+Significance:
+
+Continuous Processing: The OnUpdate function is where your component performs its main processing tasks. This can include data processing, sensor readings, calculations, and any other tasks your component needs to accomplish.
+State Modification: You can modify the state variable within OnUpdate to keep track of the component's progress, count iterations, or store temporary data between updates.
+Decision Making: Based on the input data and the component's internal state, you can make decisions within OnUpdate about whether to continue processing or to stop the component's execution.
+Practical Use
+These functions are the core of your component's behavior. Typically, you'll customize them to suit your specific use case. For example, in the provided code, OnInit initializes the state and prints configuration data, while OnUpdate increments the state and stops after a certain condition is met (when the state reaches 10).
+
+In practice, OnInit might load configuration files, set up connections to external devices or services, and prepare any data structures needed for the component. OnUpdate is where the real work happens, processing incoming data and updating the component's state.
+
+Feel free to adapt these functions to your specific component's requirements, such as image processing, data analysis, or control systems. The key is to encapsulate your component's behavior within these functions and leverage the shared configuration and state to achieve your goals.
+
+2. Include the necessary headers in your C++ source file:
+
+```
+#include "Application/Example/ExampleComponentLibrary/ExampleComponentLibrary.hpp"
+#include "Library/Component/Component.hpp"
+#include "Library/Component/ComponentImpl.hpp"
+```
+
+3. Decide what config and state types should be used and create an instance of the component. Example:
+```
+Component<example::Person, uint8_t>
+```
+
+**Note:** Prefer to use statically typed structs for state and use protobuf message types for config types.
+
+### How to run ExampleComponent.cc:
+```
+docker@vision:/Vision$ bazel run Application/Example:example_component -- --config_path=/Vision/Data/Example/ExampleData.txt
+INFO: Analyzed target //Application/Example:example_component (0 packages loaded, 0 targets configured).
+INFO: Found 1 target...
+Target //Application/Example:example_component up-to-date:
+  bazel-bin/Application/Example/example_component
+INFO: Elapsed time: 0.646s, Critical Path: 0.00s
+INFO: 1 process: 1 internal.
+INFO: Build completed successfully, 1 total action
+INFO: Running command line: bazel-bin/Application/Example/example_component '--config_path=/Vision/Data/Example/ExampleData.txt'
+OnInit is called!
+1, Armin, armin@vision.com
+State is: 0
+OnUpdate is called for 1th time!
+OnUpdate is called for 2th time!
+OnUpdate is called for 3th time!
+OnUpdate is called for 4th time!
+OnUpdate is called for 5th time!
+OnUpdate is called for 6th time!
+OnUpdate is called for 7th time!
+OnUpdate is called for 8th time!
+OnUpdate is called for 9th time!
+OnUpdate is called for 10th time!
+```

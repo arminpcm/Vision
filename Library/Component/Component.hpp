@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include <gflags/gflags.h>
-
 #include <array>
 #include <functional>
 
@@ -25,14 +23,16 @@ using vision::time::Clock;
 
 template <typename ConfigType, typename StateType>
 class Component {
+using OnInitFunctionType=std::function<void(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&)>;
+using OnUpdateFunctionType=std::function<bool(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&)>;
  public:
   /// @brief Constructor that reads commandline argument and loads the config file
   /// @param argc the argument count passed from main function
   /// @param argv the argument vector passed from the main function
   Component(int argc,
             const std::shared_ptr<char**> &argv,
-            std::function<void(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&)> on_init,
-            std::function<bool(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&)> on_update);
+            OnInitFunctionType on_init,
+            OnUpdateFunctionType on_update);
   /// @brief The virtual destructor
   virtual ~Component();
 
