@@ -97,12 +97,12 @@ void Component<ConfigType, StateType>::Stop() {
 }
 
 template <typename ConfigType, typename StateType>
-ConfigType& Component<ConfigType, StateType>::GetConfig() {
+std::shared_ptr<ConfigType>& Component<ConfigType, StateType>::GetConfig() {
     return config_;
 }
 
 template <typename ConfigType, typename StateType>
-StateType& Component<ConfigType, StateType>::GetState() {
+std::shared_ptr<StateType>& Component<ConfigType, StateType>::GetState() {
     return state_;
 }
 

@@ -46,8 +46,8 @@ using OnUpdateFunctionType=std::function<bool(std::shared_ptr<ConfigType>, std::
   // Deleted functions
   Component() = delete;
 
-  ConfigType& GetConfig();
-  StateType& GetState();
+  std::shared_ptr<ConfigType>& GetConfig();
+  std::shared_ptr<StateType>& GetState();
 
  private:
   std::shared_ptr<ConfigType> config_;
