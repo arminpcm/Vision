@@ -8,12 +8,15 @@
 // tort or otherwise, arising from, out of or in connection with
 // the software or the use or other dealings in the software.
 
-#include "Library/Component/BaseComponent.h"
+#pragma once
+
+#include "Library/Component/Component.h"
 
 #include <gflags/gflags.h>
 
 #include <atomic>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <thread>
 #include <utility>
@@ -23,8 +26,14 @@ namespace component {
 
 using vision::config::ConfigInterface;
 
+DEFINE_string(config_path, "", "Path to the config file");  // NOLIT
+
 template <typename ConfigType, typename StateType>
-BaseComponent<ConfigType, StateType>::BaseComponent(int argc, const std::shared_ptr<char**>& argv) {
+Component<ConfigType, StateType>::Component(int argc,
+            const std::shared_ptr<char**> &argv,
+            std::function<void(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&)> on_init,
+            std::function<bool(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&)> on_update) :
+            on_init_function_(std::move(on_init)), on_update_function_(std::move(on_update)) {
     // Initialize gflags
     gflags::ParseCommandLineFlags(&argc, &*argv.get(), true);
     // Check if the required flags are provided
@@ -33,13 +42,15 @@ BaseComponent<ConfigType, StateType>::BaseComponent(int argc, const std::shared_
         throw std::runtime_error("Providing config_path flag is mandatory");
     }
 
-    auto config_interface = ConfigInterface<ConfigType>(std::string(FLAGS_config_path));
+    ConfigInterface<ConfigType> config_loader{std::string(FLAGS_config_path)};
+
+    config_ = std::make_shared<ConfigType>(config_loader.GetConfig());
 }
 
 template <typename ConfigType, typename StateType>
-void BaseComponent<ConfigType, StateType>::Run(uint32_t frequency) {
+void Component<ConfigType, StateType>::Run(uint32_t frequency) {
     // Call OnInit before starting the update loop
-    OnInit();
+    on_init_function_(config_, state_);
 
     // Calculate the time interval between updates
     const uint64_t update_interval_ns = 1000000000 / frequency; // Frequency in Hz to nanoseconds
@@ -49,8 +60,16 @@ void BaseComponent<ConfigType, StateType>::Run(uint32_t frequency) {
         while (!exit_requested_) {
             clock_.Reset();
             
-            // Call the user-defined update function
-            OnUpdate();
+            {
+                std::lock_guard<std::mutex> lock(state_mutex_); // Lock the mutex
+
+                // Call the user-defined update function
+                auto return_flag = on_update_function_(config_, state_);
+
+                if (return_flag == false) {
+                    exit_requested_ = true;
+                }
+            }
 
             // Calculate how much time to sleep to achieve the desired update frequency
             auto elapsed_time = clock_.ElapsedTime();
@@ -62,24 +81,26 @@ void BaseComponent<ConfigType, StateType>::Run(uint32_t frequency) {
 }
 
 template <typename ConfigType, typename StateType>
-BaseComponent<ConfigType, StateType>::~BaseComponent() {
+Component<ConfigType, StateType>::~Component() {
     if (update_thread_.joinable()) {
         update_thread_.join();
     }
+    config_.reset();
+    state_.reset();
 }
 
 template <typename ConfigType, typename StateType>
-void BaseComponent<ConfigType, StateType>::Stop() {
+void Component<ConfigType, StateType>::Stop() {
     exit_requested_ = true;
 }
 
 template <typename ConfigType, typename StateType>
-ConfigType& BaseComponent<ConfigType, StateType>::GetConfig() {
+ConfigType& Component<ConfigType, StateType>::GetConfig() {
     return config_;
 }
 
 template <typename ConfigType, typename StateType>
-StateType& BaseComponent<ConfigType, StateType>::GetState() {
+StateType& Component<ConfigType, StateType>::GetState() {
     return state_;
 }
 

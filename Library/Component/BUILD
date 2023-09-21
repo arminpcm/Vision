@@ -1,13 +1,11 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "base_component",
+    name = "component",
     hdrs = [
-        "BaseComponent.hpp",
-        "BaseComponent.h",
-        "BaseComponent.cc",
+        "Component.h",
     ],
-    srcs = ["BaseComponent.cc"],
+    srcs = ["ComponentImpl.h",],
     deps = [
         "//Library/ConfigInterface:config_interface",
         "//Library/Common/Time:clock",

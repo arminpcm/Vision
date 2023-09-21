@@ -29,3 +29,12 @@ cc_binary(
         "@gflags"
     ],
 )
+
+cc_binary(
+    name = "example_component",
+    srcs = ["ExampleComponent.cc",],
+    deps = [
+        "//Application/Example/ExampleComponentLibrary:example_component_library",
+        "//Library/Component:component",
+    ],
+)
