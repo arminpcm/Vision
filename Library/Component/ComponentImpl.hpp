@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "Library/Component/Component.h"
+#include "Library/Component/Component.hpp"
 
 #include <gflags/gflags.h>
 
@@ -26,14 +26,16 @@ namespace component {
 
 using vision::config::ConfigInterface;
 
-DEFINE_string(config_path, "", "Path to the config file");  // NOLIT
+DEFINE_string(config_path, "", "Path to the config file");  // NOLINT
 
-template <typename ConfigType, typename StateType>
-Component<ConfigType, StateType>::Component(int argc,
-            const std::shared_ptr<char**> &argv,
-            std::function<void(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&)> on_init,
-            std::function<bool(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&)> on_update) :
-            on_init_function_(std::move(on_init)), on_update_function_(std::move(on_update)) {
+template <typename ConfigType, typename StateType>  // NOLINT
+Component<ConfigType, StateType>::Component(  // NOLINT
+    int argc,  // NOLINT
+    const std::shared_ptr<char**> &argv,  // NOLINT
+    OnInitFunctionType on_init,  // NOLINT
+    OnUpdateFunctionType on_update) :  // NOLINT
+        on_init_function_(std::move(on_init)),  // NOLINT
+        on_update_function_(std::move(on_update)) {  // NOLINT
     // Initialize gflags
     gflags::ParseCommandLineFlags(&argc, &*argv.get(), true);
     // Check if the required flags are provided
