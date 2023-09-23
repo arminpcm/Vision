@@ -8,6 +8,8 @@
 // tort or otherwise, arising from, out of or in connection with
 // the software or the use or other dealings in the software.
 
+#pragma once
+
 #include <iostream>
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -17,39 +19,38 @@
 
 #include "Library/SharedMemory/ChannelHeader.hpp"
 
-template <typename MessageType>
 class Publisher {
 private:
-    int shm_id_;          // Shared memory ID
-    void* shared_memory_; // Pointer to the shared memory
+    int shm_id_;           // Shared memory ID
+    void* shared_memory_;  // Pointer to the shared memory
+    key_t shared_memory_key_;  // The shared memory key
+    size_t capacity_;          // The size of the buffer (number of elements to be saved)
+    size_t message_length_;  // The length of the messages
 
 public:
-    Publisher(key_t key, size_t capacity_);
+    Publisher(key_t key, size_t capacity, size_t message_length);
     ~Publisher();
 
     void Init();
 
-    void Publish(const MessageType& message);
+    void Publish(const char* message);
 };
 
-template <typename MessageType>
-Publisher<MessageType>::Publisher(key_t key, size_t capacity_)
-    : shared_memory_Key(key) {
-    SetUp();
+Publisher::Publisher(key_t key, size_t capacity, size_t message_length)
+    : shared_memory_key_(key), capacity_(capacity), message_length_(message_length) {
+    Init();
 }
 
-template <typename MessageType>
-Publisher<MessageType>::~Publisher() {
+Publisher::~Publisher() {
     // Detach from shared memory
     shmdt(shared_memory_);
 }
 
-template <typename MessageType>
-void Publisher<MessageType>::Init() {
+void Publisher::Init() {
     // Create or attach to shared memory segment and initialize it
 
     // Try to create the shared memory segment
-    shm_id_ = shmget(shared_memory_Key, sizeof(ChannelHeader<MessageType>) + sizeof(MessageType) * capacity_, IPC_CREAT | IPC_EXCL | 0666);
+    shm_id_ = shmget(shared_memory_key_, sizeof(ChannelHeader) + capacity_ * message_length_, IPC_CREAT | IPC_EXCL | 0666);
 
     if (shm_id_ == -1) {
         // If it already exists, throw an exception
@@ -69,27 +70,27 @@ void Publisher<MessageType>::Init() {
     }
 
     // Initialize the ChannelHeader if it's a new segment
-    ChannelHeader<MessageType>* header = static_cast<ChannelHeader<MessageType>*>(shared_memory_);
+    ChannelHeader* header = static_cast<ChannelHeader*>(shared_memory_);
     if (header->capacity_ == 0) {
         header->capacity_ = capacity_;
         header->start_ = 0;
         header->end_ = 0;
         header->size_ = 0;
-        pthread_mutex_init(&(header->writer_mutex_), NULL);
+        pthread_mutex_init(&(header->channel_mutex_), NULL);
+        header->num_readers_ = 0;
     }
 }
 
-template <typename MessageType>
-void Publisher<MessageType>::Publish(const MessageType& message) {
+void Publisher::Publish(const char* message) {
     // Lock the writer mutex to ensure exclusive access
-    ChannelHeader<MessageType>* header = static_cast<ChannelHeader<MessageType>*>(shared_memory_);
-    pthread_mutex_lock(&(header->writer_mutex_));
+    ChannelHeader* header = static_cast<ChannelHeader*>(shared_memory_);
+    pthread_mutex_lock(&(header->channel_mutex_));
 
     // Calculate the offset for the new data
-    char* offset = static_cast<char*>(shared_memory_) + sizeof(ChannelHeader<MessageType>) + header->end_ * sizeof(MessageType);
+    char* offset = static_cast<char*>(shared_memory_) + sizeof(ChannelHeader) + header->end_ * message_length_;
 
-    // Serialize and copy the message
-    message.SerializeToArray(offset, sizeof(MessageType));
+    // Copy the message
+    std::memcpy(offset, message, message_length_);
 
     // Update circular buffer pointers
     header->end_ = (header->end_ + 1) % header->capacity_;
@@ -98,11 +99,11 @@ void Publisher<MessageType>::Publish(const MessageType& message) {
         header->size_++;
     } else {
         // Error: Buffer is full, print an error message
-        std::cerr << "Error: Buffer is full. Overwriting data." << std::end_l;
+        std::cerr << "Error: Buffer is full. Overwriting data." << std::endl;
         // Update the start_ pointer to overwrite the oldest data
         header->start_ = (header->start_ + 1) % header->capacity_;
     }
 
     // Unlock the writer mutex
-    pthread_mutex_unlock(&(header->writer_mutex_));
+    pthread_mutex_unlock(&(header->channel_mutex_));
 }

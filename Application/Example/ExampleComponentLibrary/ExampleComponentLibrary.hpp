@@ -12,7 +12,8 @@
 
 #include <memory>
 #include <iostream>
-#include "Library/ConfigInterface/proto/person.pb.h"
+#include "Library/ConfigInterface/proto/example_config.pb.h"
+#include "Library/ConfigInterface/proto/example_message.pb.h"
 
 namespace vision{
 namespace component {
@@ -21,11 +22,11 @@ namespace component {
 /// @param config The input argument that component fills out from the config file
 /// @param state The state struct (protobuf or c++ struct) that OnInit and OnUpdate can access and modify
 /// @return True if successful, false if an error occured
-bool OnInit(std::shared_ptr<example::Person> config, std::shared_ptr<uint8_t>& state) {
+bool OnInit(std::shared_ptr<example::ExampleConfig> config, std::shared_ptr<uint8_t>& state) {
   std::cout << "OnInit is called!" << std::endl;
   state = std::make_shared<uint8_t>(0);
-  std::cout << config->id() << ", " << config->name() << ", " << config->email() << std::endl;
   std::cout << "State is: " << std::to_string(*state) << std::endl;
+  std::cout << "Config is: " << config->DebugString() << std::endl;
   return true;
 }
 
@@ -33,15 +34,27 @@ bool OnInit(std::shared_ptr<example::Person> config, std::shared_ptr<uint8_t>& s
 /// @param config The input argument that component fills out from the config file
 /// @param state The state struct (protobuf or c++ struct) that OnInit and OnUpdate can access and modify
 /// @return True if successful, false if an error occured
-bool OnUpdate(std::shared_ptr<example::Person> config, std::shared_ptr<uint8_t>& state) {
+bool OnUpdate(std::shared_ptr<example::ExampleConfig> config, std::shared_ptr<uint8_t>& state) {
   (*state)++;
   std::cout << "OnUpdate is called for " << std::to_string(*state) << "th time!" << std::endl;
-  config->set_id(*state);
   if (*state < 10) {
     return true;
   } else {
     return false;
   }
+}
+
+/// @brief The callback for an example message
+/// @param message 
+/// @param length 
+void ExampleCallback(std::unique_ptr<char> message, size_t length) {
+    example::ExampleMessage received_message;
+    
+    if (received_message.ParseFromArray(message.get(), length)) {
+        std::cout << "Got this message: " << received_message.DebugString() << std::endl;
+    } else {
+        std::cout << "Failed to parse the message!" << std::endl;
+    }
 }
 
 }  // namespace component

@@ -8,6 +8,8 @@
 // tort or otherwise, arising from, out of or in connection with
 // the software or the use or other dealings in the software.
 
+#pragma once
+
 #include <iostream>
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -19,5 +21,6 @@ struct ChannelHeader {
     size_t start_;         // Start position of circular buffer
     size_t end_;           // End position of circular buffer
     size_t size_;          // Current size of the channel
-    pthread_mutex_t writer_mutex_; // Mutex for the writer
+    pthread_mutex_t channel_mutex_;  // Mutex for the channel
+    uint64_t num_readers_;       // Number of active readers
 };

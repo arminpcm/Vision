@@ -10,11 +10,15 @@
 
 #pragma once
 
+#include <sys/ipc.h>
+
 #include <array>
 #include <functional>
 
 #include "Library/Common/Time/Clock.hpp"
 #include "Library/ConfigInterface/ConfigInterface.hpp"
+#include "Library/SharedMemory/Publisher.hpp"
+#include "Library/SharedMemory/Subscriber.hpp"
 
 namespace vision {
 namespace component {
@@ -36,6 +40,8 @@ using OnUpdateFunctionType=std::function<bool(std::shared_ptr<ConfigType>, std::
   /// @brief The virtual destructor
   virtual ~Component();
 
+  key_t GenerateKeyFromTopic(const std::string& topic_name, int name_space);
+
   /// @brief The main function that calls OnUpdate on a given freqency
   /// @param frequency The frequency at which the OnUpdate function would be called on a separate thread
   void Run(uint32_t frequency);
@@ -49,6 +55,17 @@ using OnUpdateFunctionType=std::function<bool(std::shared_ptr<ConfigType>, std::
   std::shared_ptr<ConfigType>& GetConfig();
   std::shared_ptr<StateType>& GetState();
 
+  void CreatePublisher(const std::string& topic_name,
+                       int name_space,
+                       size_t capacity,
+                       size_t message_length);
+  void CreateSubscriber(const std::string& topic_name,
+                        int name_space,
+                        SubscriberMode mode,
+                        size_t message_length,
+                        const std::function<void(std::unique_ptr<char>, size_t)>& callback);
+
+
  private:
   std::shared_ptr<ConfigType> config_;
   std::shared_ptr<StateType> state_;
@@ -60,6 +77,11 @@ using OnUpdateFunctionType=std::function<bool(std::shared_ptr<ConfigType>, std::
   std::thread update_thread_;
   std::atomic<bool> exit_requested_ = {false};
   std::mutex state_mutex_;
+
+  std::vector<std::shared_ptr<Publisher>> publishers_;
+  std::vector<std::shared_ptr<Subscriber>> subscribers_;
+
+  bool is_initialized_{false};
 };
 
 }  // namespace component

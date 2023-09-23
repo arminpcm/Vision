@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package example;
+
+message Publisher {
+  string topic_name = 1001;
+  int32 queue_size = 1002;
+}
+
+message Subscriber {
+  string topic_name = 2001;
+}
+
+message ExampleConfig {
+  string component_name = 100;
+  repeated Publisher publishers = 101;
+  repeated Subscriber subscribers = 102;
+}

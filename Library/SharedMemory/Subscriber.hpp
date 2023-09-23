@@ -8,6 +8,8 @@
 // tort or otherwise, arising from, out of or in connection with
 // the software or the use or other dealings in the software.
 
+#pragma once
+
 #include <iostream>
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -15,52 +17,51 @@
 #include <cstring>
 #include <stdexcept>
 #include <functional>
+#include <memory>
 
 #include "Library/SharedMemory/ChannelHeader.hpp"
 
-// Enum for mode selection
 enum class SubscriberMode {
     GET_LAST,
     GET_FIRST
 };
 
 
-template <typename MessageType>
 class Subscriber {
 private:
     int shm_id_;              // Shared memory ID
     void* shared_memory_;     // Pointer to the shared memory
-    key_t shared_memory_Key;  // Key for the shared memory segment
-    SubscriberMode mode_;    // Mode for reading messages
-    std::function<void(const MessageType&)> callback_;  // Callback function
+    key_t shared_memory_key_;  // Key for the shared memory segment
+    SubscriberMode mode_;     // Mode for reading messages
+    std::function<void(std::unique_ptr<char>, size_t)> callback_;  // Callback function
+    size_t message_length_;   // Length of the messages
 
 public:
-    Subscriber(key_t key, SubscriberMode mode_, const std::function<void(const MessageType&)>& callback_);
+    Subscriber(key_t key, SubscriberMode mode_, size_t message_length, const std::function<void(std::unique_ptr<char>, size_t)>& callback_);
     ~Subscriber();
 
     void Init();
     void SpinOnce();
+
+    void IncrementReaders();
+    void DecrementReaders();
 };
 
-template <typename MessageType>
-Subscriber<MessageType>::Subscriber(key_t key, SubscriberMode mode_, const std::function<void(const MessageType&)>& callback_)
-    : shared_memory_Key(key), mode_(mode), callback_(callback_) {
+Subscriber::Subscriber(key_t key, SubscriberMode mode_, size_t message_length, const std::function<void(std::unique_ptr<char>, size_t)>& callback_)
+    : shared_memory_key_(key), mode_(mode_), callback_(callback_), message_length_(message_length) {
     Init();
 }
 
-template <typename MessageType>
-Subscriber<MessageType>::~Subscriber() {
+Subscriber::~Subscriber() {
     // Detach from shared memory
     shmdt(shared_memory_);
 }
 
-
-template <typename MessageType>
-void Subscriber<MessageType>::Init() {
+void Subscriber::Init() {
     // Attach to shared memory segment
 
     // Try to attach to the shared memory segment
-    shm_id_ = shmget(shared_memory_Key, 0, 0);
+    shm_id_ = shmget(shared_memory_key_, 0, 0);
 
     if (shm_id_ == -1) {
         // If it doesn't exist, throw an exception
@@ -80,23 +81,25 @@ void Subscriber<MessageType>::Init() {
     }
 }
 
-template <typename MessageType>
-void Subscriber<MessageType>::SpinOnce() {
+void Subscriber::SpinOnce() {
     // Lock the writer mutex to ensure data consistency
-    ChannelHeader<MessageType>* header = static_cast<ChannelHeader<MessageType>*>(shared_memory_);
-    pthread_mutex_lock(&(header->writer_mutex_));
+    ChannelHeader* header = static_cast<ChannelHeader*>(shared_memory_);
+
+    if (header->size_ <= 0) {
+        return;
+    }
+    pthread_mutex_lock(&(header->channel_mutex_));
 
     if (header->size_ > 0) {
         // Determine the index to read based on the mode
         size_t index = (mode_ == SubscriberMode::GET_LAST) ? ((header->end_ - 1 + header->capacity_) % header->capacity_) : header->start_;
 
         // Calculate the offset for reading
-        char* offset = static_cast<char*>(shared_memory_) + sizeof(ChannelHeader<MessageType>) + index * sizeof(MessageType);
+        char* offset = static_cast<char*>(shared_memory_) + sizeof(ChannelHeader) + index * message_length_;
 
-        // Deserialize and call the callback function
-        MessageType message;
-        message.ParseFromArray(offset, sizeof(MessageType));
-        callback_(message);
+        // Create a unique_ptr and copy the message
+        std::unique_ptr<char> message(new char[message_length_]);
+        std::memcpy(message.get(), offset, message_length_);
 
         // Update the circular buffer pointers and size
         if (mode_ == SubscriberMode::GET_LAST) {
@@ -105,8 +108,35 @@ void Subscriber<MessageType>::SpinOnce() {
             header->start_ = (header->start_ + 1) % header->capacity_;
             header->size_--;
         }
-    }
 
-    // Unlock the writer mutex
-    pthread_mutex_unlock(&(header->writer_mutex_));
+        // Unlock the writer mutex
+        pthread_mutex_unlock(&(header->channel_mutex_));
+
+        // Call the callback with the message
+        callback_(std::move(message), message_length_);
+    }
+}
+
+void Subscriber::IncrementReaders() {
+    // Lock the header mutex to ensure exclusive access to num_readers_
+    ChannelHeader* header = static_cast<ChannelHeader*>(shared_memory_);
+    pthread_mutex_lock(&(header->channel_mutex_));
+
+    // Increment the number of readers
+    header->num_readers_++;
+
+    // Unlock the header mutex
+    pthread_mutex_unlock(&(header->channel_mutex_));
+}
+
+void Subscriber::DecrementReaders() {
+    // Lock the header mutex to ensure exclusive access to num_readers_
+    ChannelHeader* header = static_cast<ChannelHeader*>(shared_memory_);
+    pthread_mutex_lock(&(header->channel_mutex_));
+
+    // Decrement the number of readers
+    header->num_readers_--;
+
+    // Unlock the header mutex
+    pthread_mutex_unlock(&(header->channel_mutex_));
 }

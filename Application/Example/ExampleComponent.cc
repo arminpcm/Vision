@@ -12,19 +12,27 @@
 #include "Library/Component/Component.hpp"
 #include "Library/Component/ComponentImpl.hpp"
 
+
 using vision::component::Component;
 
 constexpr float FREQUENCY = 10.0;
+constexpr auto TOPIC_NAME = "/example_topic_1";
+constexpr int NAMESPACE = 0;
+constexpr int QUEUE_SIZE = 10;
 
 int main(int argc, char* argv[]) {
     try {
-    std::shared_ptr<char**> shared_argv(&argv);
-    Component<example::Person, uint8_t> example_component(argc,
-                                                          shared_argv,
-                                                          vision::component::OnInit,
-                                                          vision::component::OnUpdate);
+        std::shared_ptr<char**> shared_argv(&argv);
+        Component<example::ExampleConfig, uint8_t> example_component(argc,
+            shared_argv,
+            vision::component::OnInit,
+            vision::component::OnUpdate);
 
-    example_component.Run(FREQUENCY);
+        // Create publishers and subscribers
+        example_component.CreatePublisher(TOPIC_NAME, NAMESPACE, QUEUE_SIZE, sizeof(example::ExampleMessage));
+        example_component.CreateSubscriber(TOPIC_NAME, NAMESPACE, SubscriberMode::GET_FIRST, sizeof(example::ExampleMessage), vision::component::ExampleCallback);
+
+        example_component.Run(FREQUENCY);
     } catch (...) {
         std::cout << "An exception happened!" << std::endl;
     }
