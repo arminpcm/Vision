@@ -28,14 +28,14 @@ enum class SubscriberMode {
 template <typename MessageType>
 class Subscriber {
 private:
-    int shmID;              // Shared memory ID
-    void* sharedMemory;     // Pointer to the shared memory
-    key_t sharedMemoryKey;  // Key for the shared memory segment
-    SubscriberMode mode;    // Mode for reading messages
-    std::function<void(const MessageType&)> callback;  // Callback function
+    int shm_id_;              // Shared memory ID
+    void* shared_memory_;     // Pointer to the shared memory
+    key_t shared_memory_Key;  // Key for the shared memory segment
+    SubscriberMode mode_;    // Mode for reading messages
+    std::function<void(const MessageType&)> callback_;  // Callback function
 
 public:
-    Subscriber(key_t key, SubscriberMode mode, const std::function<void(const MessageType&)>& callback);
+    Subscriber(key_t key, SubscriberMode mode_, const std::function<void(const MessageType&)>& callback_);
     ~Subscriber();
 
     void Init();
@@ -43,15 +43,15 @@ public:
 };
 
 template <typename MessageType>
-Subscriber<MessageType>::Subscriber(key_t key, SubscriberMode mode, const std::function<void(const MessageType&)>& callback)
-    : sharedMemoryKey(key), mode(mode), callback(callback) {
+Subscriber<MessageType>::Subscriber(key_t key, SubscriberMode mode_, const std::function<void(const MessageType&)>& callback_)
+    : shared_memory_Key(key), mode_(mode), callback_(callback_) {
     Init();
 }
 
 template <typename MessageType>
 Subscriber<MessageType>::~Subscriber() {
     // Detach from shared memory
-    shmdt(sharedMemory);
+    shmdt(shared_memory_);
 }
 
 
@@ -60,9 +60,9 @@ void Subscriber<MessageType>::Init() {
     // Attach to shared memory segment
 
     // Try to attach to the shared memory segment
-    shmID = shmget(sharedMemoryKey, 0, 0);
+    shm_id_ = shmget(shared_memory_Key, 0, 0);
 
-    if (shmID == -1) {
+    if (shm_id_ == -1) {
         // If it doesn't exist, throw an exception
         if (errno == ENOENT) {
             throw std::runtime_error("Shared memory segment is not initialized.");
@@ -73,8 +73,8 @@ void Subscriber<MessageType>::Init() {
     }
 
     // Attach to shared memory
-    sharedMemory = shmat(shmID, NULL, 0);
-    if (sharedMemory == (void*)-1) {
+    shared_memory_ = shmat(shm_id_, NULL, 0);
+    if (shared_memory_ == (void*)-1) {
         perror("shmat");
         exit(1);
     }
@@ -83,30 +83,30 @@ void Subscriber<MessageType>::Init() {
 template <typename MessageType>
 void Subscriber<MessageType>::SpinOnce() {
     // Lock the writer mutex to ensure data consistency
-    ChannelHeader<MessageType>* header = static_cast<ChannelHeader<MessageType>*>(sharedMemory);
-    pthread_mutex_lock(&(header->writerMutex));
+    ChannelHeader<MessageType>* header = static_cast<ChannelHeader<MessageType>*>(shared_memory_);
+    pthread_mutex_lock(&(header->writer_mutex_));
 
-    if (header->size > 0) {
+    if (header->size_ > 0) {
         // Determine the index to read based on the mode
-        size_t index = (mode == SubscriberMode::GET_LAST) ? ((header->end - 1 + header->capacity) % header->capacity) : header->start;
+        size_t index = (mode_ == SubscriberMode::GET_LAST) ? ((header->end_ - 1 + header->capacity_) % header->capacity_) : header->start_;
 
         // Calculate the offset for reading
-        char* offset = static_cast<char*>(sharedMemory) + sizeof(ChannelHeader<MessageType>) + index * sizeof(MessageType);
+        char* offset = static_cast<char*>(shared_memory_) + sizeof(ChannelHeader<MessageType>) + index * sizeof(MessageType);
 
         // Deserialize and call the callback function
         MessageType message;
         message.ParseFromArray(offset, sizeof(MessageType));
-        callback(message);
+        callback_(message);
 
         // Update the circular buffer pointers and size
-        if (mode == SubscriberMode::GET_LAST) {
-            header->size--;
+        if (mode_ == SubscriberMode::GET_LAST) {
+            header->size_--;
         } else {
-            header->start = (header->start + 1) % header->capacity;
-            header->size--;
+            header->start_ = (header->start_ + 1) % header->capacity_;
+            header->size_--;
         }
     }
 
     // Unlock the writer mutex
-    pthread_mutex_unlock(&(header->writerMutex));
+    pthread_mutex_unlock(&(header->writer_mutex_));
 }

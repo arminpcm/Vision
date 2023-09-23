@@ -15,9 +15,9 @@
 #include <cstring>
 
 struct ChannelHeader {
-    size_t capacity;      // Capacity of the channel
-    size_t start;         // Start position of circular buffer
-    size_t end;           // End position of circular buffer
-    size_t size;          // Current size of the channel
-    pthread_mutex_t writerMutex; // Mutex for the writer
+    size_t capacity_;      // Capacity of the channel
+    size_t start_;         // Start position of circular buffer
+    size_t end_;           // End position of circular buffer
+    size_t size_;          // Current size of the channel
+    pthread_mutex_t writer_mutex_; // Mutex for the writer
 };
