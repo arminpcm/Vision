@@ -38,16 +38,3 @@ proto_library(
         "@com_google_protobuf//:any_proto",
     ],
 )
-
-cc_proto_library(
-    name = "example_message_cc_proto",
-    deps = [":example_message_proto"],
-)
-
-proto_library(
-    name = "example_message_proto",
-    srcs = ["example_message.proto"],
-    deps = [
-        "@com_google_protobuf//:any_proto",
-    ],
-)

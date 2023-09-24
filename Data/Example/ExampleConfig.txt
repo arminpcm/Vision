@@ -1,0 +1,14 @@
+{
+    "component_name": "ExampleComponent",
+    "publishers": [
+        {
+            "topic_name": "example_topic",
+            "queue_size": 10
+        }
+    ],
+    "subscribers": [
+        {
+            "topic_name": "example_topic"
+        }
+    ]
+}

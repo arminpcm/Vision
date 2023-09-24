@@ -29,56 +29,46 @@ enum class SubscriberMode {
 
 class Subscriber {
 private:
-    int shm_id_;              // Shared memory ID
+    std::string topic_name_;    // Name for the shared memory segment
+    int shm_fd_;              // Shared memory file descriptor
     void* shared_memory_;     // Pointer to the shared memory
-    key_t shared_memory_key_;  // Key for the shared memory segment
     SubscriberMode mode_;     // Mode for reading messages
     std::function<void(std::unique_ptr<char>, size_t)> callback_;  // Callback function
     size_t message_length_;   // Length of the messages
 
 public:
-    Subscriber(key_t key, SubscriberMode mode_, size_t message_length, const std::function<void(std::unique_ptr<char>, size_t)>& callback_);
+    Subscriber(const std::string& topic_name, SubscriberMode mode, size_t message_length, const std::function<void(std::unique_ptr<char>, size_t)> callback);
     ~Subscriber();
 
-    void Init();
     void SpinOnce();
 
     void IncrementReaders();
     void DecrementReaders();
 };
 
-Subscriber::Subscriber(key_t key, SubscriberMode mode_, size_t message_length, const std::function<void(std::unique_ptr<char>, size_t)>& callback_)
-    : shared_memory_key_(key), mode_(mode_), callback_(callback_), message_length_(message_length) {
-    Init();
+Subscriber::Subscriber(const std::string& topic_name, SubscriberMode mode, size_t message_length, const std::function<void(std::unique_ptr<char>, size_t)> callback)
+    : topic_name_(topic_name), mode_(mode), callback_(std::move(callback)), message_length_(message_length) {
+    // Open the shared memory segment
+    shm_fd_ = shm_open(topic_name.c_str(), O_RDWR, 0);
+    if (shm_fd_ == -1) {
+        perror("shm_open");
+        exit(1);
+    }
+
+    // Map the shared memory segment to the process's address space
+    size_t size = sizeof(ChannelHeader) + message_length_;
+    shared_memory_ = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd_, 0);
+    if (shared_memory_ == MAP_FAILED) {
+        perror("mmap");
+        close(shm_fd_);
+        exit(1);
+    }
 }
 
 Subscriber::~Subscriber() {
-    // Detach from shared memory
-    shmdt(shared_memory_);
-}
-
-void Subscriber::Init() {
-    // Attach to shared memory segment
-
-    // Try to attach to the shared memory segment
-    shm_id_ = shmget(shared_memory_key_, 0, 0);
-
-    if (shm_id_ == -1) {
-        // If it doesn't exist, throw an exception
-        if (errno == ENOENT) {
-            throw std::runtime_error("Shared memory segment is not initialized.");
-        } else {
-            perror("shmget");
-            exit(1);
-        }
-    }
-
-    // Attach to shared memory
-    shared_memory_ = shmat(shm_id_, NULL, 0);
-    if (shared_memory_ == (void*)-1) {
-        perror("shmat");
-        exit(1);
-    }
+    // Unmap and close the shared memory segment
+    munmap(shared_memory_, sizeof(ChannelHeader) + message_length_);
+    close(shm_fd_);
 }
 
 void Subscriber::SpinOnce() {
@@ -100,15 +90,7 @@ void Subscriber::SpinOnce() {
         // Create a unique_ptr and copy the message
         std::unique_ptr<char> message(new char[message_length_]);
         std::memcpy(message.get(), offset, message_length_);
-
-        // Update the circular buffer pointers and size
-        if (mode_ == SubscriberMode::GET_LAST) {
-            header->size_--;
-        } else {
-            header->start_ = (header->start_ + 1) % header->capacity_;
-            header->size_--;
-        }
-
+        
         // Unlock the writer mutex
         pthread_mutex_unlock(&(header->channel_mutex_));
 

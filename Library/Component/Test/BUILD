@@ -5,7 +5,8 @@ cc_test(
     srcs = ["ComponentTest.cc"],
     deps = [
         "//Library/Component:component",
-        "//Library/ConfigInterface/proto:person_cc_proto",
+        "//Library/ConfigInterface/proto:example_config_cc_proto",
+        "//Library/SharedMemory/messages:example_message",
         "@gtest//:gtest_main",
     ],
 )

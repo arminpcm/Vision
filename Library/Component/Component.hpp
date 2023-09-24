@@ -28,7 +28,7 @@ using vision::time::Clock;
 template <typename ConfigType, typename StateType>
 class Component {
 using OnInitFunctionType=std::function<void(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&)>;
-using OnUpdateFunctionType=std::function<bool(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&)>;
+using OnUpdateFunctionType=std::function<bool(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&, std::shared_ptr<std::map<std::string, std::unique_ptr<char>>>&)>;
  public:
   /// @brief Constructor that reads commandline argument and loads the config file
   /// @param argc the argument count passed from main function
@@ -39,8 +39,6 @@ using OnUpdateFunctionType=std::function<bool(std::shared_ptr<ConfigType>, std::
             OnUpdateFunctionType on_update);
   /// @brief The virtual destructor
   virtual ~Component();
-
-  key_t GenerateKeyFromTopic(const std::string& topic_name, int name_space);
 
   /// @brief The main function that calls OnUpdate on a given freqency
   /// @param frequency The frequency at which the OnUpdate function would be called on a separate thread
@@ -56,32 +54,28 @@ using OnUpdateFunctionType=std::function<bool(std::shared_ptr<ConfigType>, std::
   std::shared_ptr<StateType>& GetState();
 
   void CreatePublisher(const std::string& topic_name,
-                       int name_space,
                        size_t capacity,
                        size_t message_length);
   void CreateSubscriber(const std::string& topic_name,
-                        int name_space,
                         SubscriberMode mode,
                         size_t message_length,
-                        const std::function<void(std::unique_ptr<char>, size_t)>& callback);
+                        const std::function<void(std::unique_ptr<char>, size_t)> callback);
 
 
  private:
   std::shared_ptr<ConfigType> config_;
   std::shared_ptr<StateType> state_;
 
-  std::function<void(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&)> on_init_function_;
-  std::function<bool(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&)> on_update_function_;
+  std::function<void(const std::shared_ptr<ConfigType>&, std::shared_ptr<StateType>&)> on_init_function_;
+  std::function<bool(const std::shared_ptr<ConfigType>&, std::shared_ptr<StateType>&, std::shared_ptr<std::map<std::string, std::unique_ptr<char>>>&)> on_update_function_;
 
   Clock clock_;
   std::thread update_thread_;
   std::atomic<bool> exit_requested_ = {false};
   std::mutex state_mutex_;
 
-  std::vector<std::shared_ptr<Publisher>> publishers_;
-  std::vector<std::shared_ptr<Subscriber>> subscribers_;
-
-  bool is_initialized_{false};
+  std::map<std::string, std::shared_ptr<Publisher>> publishers_;    // Use std::map for publishers
+  std::map<std::string, std::shared_ptr<Subscriber>> subscribers_;  // Use std::map for subscribers
 };
 
 }  // namespace component

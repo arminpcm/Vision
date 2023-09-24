@@ -10,13 +10,8 @@
 
 #pragma once
 
-#include <pthread.h>
-
-struct ChannelHeader {
-    size_t capacity_;      // Capacity of the channel
-    size_t start_;         // Start position of circular buffer
-    size_t end_;           // End position of circular buffer
-    size_t size_;          // Current size of the channel
-    pthread_mutex_t channel_mutex_;  // Mutex for the channel
-    uint64_t num_readers_;       // Number of active readers
+namespace msg {
+struct ExampleMessage {
+    uint8_t id;
 };
+}

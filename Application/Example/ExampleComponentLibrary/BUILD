@@ -7,7 +7,7 @@ cc_library(
     ],
     deps = [
         "//Library/ConfigInterface/proto:example_config_cc_proto",
-        "//Library/ConfigInterface/proto:example_message_cc_proto",
+        "//Library/SharedMemory/messages:example_message"
     ],
     visibility = ["//visibility:public"],
 )
