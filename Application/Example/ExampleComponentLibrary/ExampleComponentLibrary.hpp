@@ -24,7 +24,7 @@ constexpr int MAX_ITER = 10;
 /// @param config The input argument that component fills out from the config file
 /// @param state The state struct (protobuf or c++ struct) that OnInit and OnUpdate can access and modify
 /// @return True if successful, false if an error occured
-bool OnInit(std::shared_ptr<example::ExampleConfig> config, std::shared_ptr<uint8_t>& state) {
+bool OnInit(const std::shared_ptr<example::ExampleConfig>& config, std::shared_ptr<uint8_t>& state) {
   std::cout << "OnInit is called!" << std::endl;
   state = std::make_shared<uint8_t>(0);
   std::cout << "State is: " << std::to_string(*state) << std::endl;
@@ -36,7 +36,7 @@ bool OnInit(std::shared_ptr<example::ExampleConfig> config, std::shared_ptr<uint
 /// @param config The input argument that component fills out from the config file
 /// @param state The state struct (protobuf or c++ struct) that OnInit and OnUpdate can access and modify
 /// @return True if successful, false if an error occured
-bool OnUpdate(std::shared_ptr<example::ExampleConfig> config,
+bool OnUpdate(const std::shared_ptr<example::ExampleConfig>& config,
               std::shared_ptr<uint8_t>& state,
               std::shared_ptr<std::map<std::string, std::unique_ptr<char>>>& outputs) {
     (*state)++;

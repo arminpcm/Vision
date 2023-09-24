@@ -27,8 +27,8 @@ using vision::time::Clock;
 
 template <typename ConfigType, typename StateType>
 class Component {
-using OnInitFunctionType=std::function<void(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&)>;
-using OnUpdateFunctionType=std::function<bool(std::shared_ptr<ConfigType>, std::shared_ptr<StateType>&, std::shared_ptr<std::map<std::string, std::unique_ptr<char>>>&)>;
+using OnInitFunctionType=std::function<void(const std::shared_ptr<ConfigType>&, std::shared_ptr<StateType>&)>;
+using OnUpdateFunctionType=std::function<bool(const std::shared_ptr<ConfigType>&, std::shared_ptr<StateType>&, std::shared_ptr<std::map<std::string, std::unique_ptr<char>>>&)>;
  public:
   /// @brief Constructor that reads commandline argument and loads the config file
   /// @param argc the argument count passed from main function
@@ -59,7 +59,7 @@ using OnUpdateFunctionType=std::function<bool(std::shared_ptr<ConfigType>, std::
   void CreateSubscriber(const std::string& topic_name,
                         SubscriberMode mode,
                         size_t message_length,
-                        const std::function<void(std::unique_ptr<char>, size_t)> callback);
+                        const std::function<void(std::unique_ptr<char>, size_t)>& callback);
 
 
  private:

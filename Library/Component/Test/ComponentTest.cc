@@ -30,7 +30,7 @@ constexpr int QUEUE_SIZE = 10;
 namespace vision{
 namespace component {
 
-bool OnInit(std::shared_ptr<example::ExampleConfig> config, std::shared_ptr<uint8_t>& state) {
+bool OnInit(const std::shared_ptr<example::ExampleConfig>& config, std::shared_ptr<uint8_t>& state) {
   std::cout << "OnInit is called!" << std::endl;
   state = std::make_shared<uint8_t>(0);
   std::cout << "State is: " << std::to_string(*state) << std::endl;
@@ -38,15 +38,14 @@ bool OnInit(std::shared_ptr<example::ExampleConfig> config, std::shared_ptr<uint
   return true;
 }
 
-bool OnUpdate(std::shared_ptr<example::ExampleConfig> config,
+bool OnUpdate(const std::shared_ptr<example::ExampleConfig>& config,
               std::shared_ptr<uint8_t>& state,
               std::shared_ptr<std::map<std::string, std::unique_ptr<char>>>& outputs) {
     (*state)++;
     std::cout << "OnUpdate is called for " << std::to_string(*state) << "th time!" << std::endl;
 
     // Publish a message
-    msg::ExampleMessage message;
-    message.id = static_cast<uint8_t>(*state);
+    msg::ExampleMessage message{static_cast<uint8_t>(*state)};
 
     // Serialize the message to a byte array
     size_t size = sizeof(msg::ExampleMessage);
@@ -66,7 +65,7 @@ bool OnUpdate(std::shared_ptr<example::ExampleConfig> config,
 }
 
 void ExampleCallback(std::unique_ptr<char> message, size_t length) {
-    msg::ExampleMessage received_message;
+    msg::ExampleMessage received_message{};
 
     std::memcpy(&received_message, message.get(), sizeof(msg::ExampleMessage));
     

@@ -28,8 +28,8 @@ using vision::config::ConfigInterface;
 
 DEFINE_string(config_path, "", "Path to the config file");  // NOLINT
 
-template <typename ConfigType, typename StateType>  // NOLINT
-Component<ConfigType, StateType>::Component(  // NOLINT
+template <typename ConfigType, typename StateType>
+Component<ConfigType, StateType>::Component(
     int argc,
     const std::shared_ptr<char**> &argv,
     OnInitFunctionType on_init,
@@ -138,7 +138,7 @@ void Component<ConfigType, StateType>::CreatePublisher(const std::string& topic_
 
 template <typename ConfigType, typename StateType>
 void Component<ConfigType, StateType>::CreateSubscriber(const std::string& topic_name, SubscriberMode mode, size_t message_length,
-    const std::function<void(std::unique_ptr<char>, size_t)> callback) {
+    const std::function<void(std::unique_ptr<char>, size_t)>& callback) {
     // Create and add the subscriber to the vector
     subscribers_[topic_name] = std::make_shared<Subscriber>(topic_name, mode, message_length, callback);
 }
