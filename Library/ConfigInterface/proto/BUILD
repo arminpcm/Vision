@@ -25,3 +25,16 @@ proto_library(
         "@com_google_protobuf//:any_proto",
     ],
 )
+
+cc_proto_library(
+    name = "example_config_cc_proto",
+    deps = [":example_config_proto"],
+)
+
+proto_library(
+    name = "example_config_proto",
+    srcs = ["example_config.proto"],
+    deps = [
+        "@com_google_protobuf//:any_proto",
+    ],
+)

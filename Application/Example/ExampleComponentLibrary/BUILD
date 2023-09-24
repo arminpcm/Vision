@@ -6,7 +6,8 @@ cc_library(
         "ExampleComponentLibrary.hpp",
     ],
     deps = [
-        "//Library/ConfigInterface/proto:person_cc_proto",
+        "//Library/ConfigInterface/proto:example_config_cc_proto",
+        "//Library/SharedMemory/messages:example_message"
     ],
     visibility = ["//visibility:public"],
 )

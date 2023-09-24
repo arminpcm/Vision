@@ -9,6 +9,8 @@ cc_library(
     deps = [
         "//Library/ConfigInterface:config_interface",
         "//Library/Common/Time:clock",
+        "//Library/SharedMemory:publisher",
+        "//Library/SharedMemory:subscriber",
         "@gflags"
     ],
     visibility = ["//visibility:public"],

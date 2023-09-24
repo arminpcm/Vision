@@ -12,19 +12,34 @@
 #include "Library/Component/Component.hpp"
 #include "Library/Component/ComponentImpl.hpp"
 
+
 using vision::component::Component;
 
 constexpr float FREQUENCY = 10.0;
+constexpr auto TOPIC_NAME = "example_topic";
+constexpr int QUEUE_SIZE = 10;
 
 int main(int argc, char* argv[]) {
     try {
-    std::shared_ptr<char**> shared_argv(&argv);
-    Component<example::Person, uint8_t> example_component(argc,
-                                                          shared_argv,
-                                                          vision::component::OnInit,
-                                                          vision::component::OnUpdate);
+        std::cout << "Starting!\n";
+        std::shared_ptr<char**> shared_argv(&argv);
+        std::cout << "Creating component!\n";
+        Component<example::ExampleConfig, uint8_t> example_component(
+            argc,
+            shared_argv,
+            vision::component::OnInit,
+            vision::component::OnUpdate
+        );
+        auto message_size = sizeof(msg::ExampleMessage);
+        std::cout << "Message length: " << message_size << std::endl;
+        std::cout << "Adding publisher!\n";
+        // Create publishers and subscribers
+        example_component.CreatePublisher(TOPIC_NAME, QUEUE_SIZE, message_size);
+        std::cout << "Adding subscriber!\n";
+        example_component.CreateSubscriber(TOPIC_NAME, SubscriberMode::GET_LAST, message_size, vision::component::ExampleCallback);
 
-    example_component.Run(FREQUENCY);
+        std::cout << "Running!\n";
+        example_component.Run(FREQUENCY);
     } catch (...) {
         std::cout << "An exception happened!" << std::endl;
     }

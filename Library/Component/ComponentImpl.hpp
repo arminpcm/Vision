@@ -28,14 +28,14 @@ using vision::config::ConfigInterface;
 
 DEFINE_string(config_path, "", "Path to the config file");  // NOLINT
 
-template <typename ConfigType, typename StateType>  // NOLINT
-Component<ConfigType, StateType>::Component(  // NOLINT
-    int argc,  // NOLINT
-    const std::shared_ptr<char**> &argv,  // NOLINT
-    OnInitFunctionType on_init,  // NOLINT
-    OnUpdateFunctionType on_update) :  // NOLINT
-        on_init_function_(std::move(on_init)),  // NOLINT
-        on_update_function_(std::move(on_update)) {  // NOLINT
+template <typename ConfigType, typename StateType>
+Component<ConfigType, StateType>::Component(
+    int argc,
+    const std::shared_ptr<char**> &argv,
+    OnInitFunctionType on_init,
+    OnUpdateFunctionType on_update) :
+        on_init_function_(std::move(on_init)),
+        on_update_function_(std::move(on_update)) {
     // Initialize gflags
     gflags::ParseCommandLineFlags(&argc, &*argv.get(), true);
     // Check if the required flags are provided
@@ -44,8 +44,8 @@ Component<ConfigType, StateType>::Component(  // NOLINT
         throw std::runtime_error("Providing config_path flag is mandatory");
     }
 
+    // Load configuration and create publishers and subscribers
     ConfigInterface<ConfigType> config_loader{std::string(FLAGS_config_path)};
-
     config_ = std::make_shared<ConfigType>(config_loader.GetConfig());
 }
 
@@ -60,17 +60,41 @@ void Component<ConfigType, StateType>::Run(uint32_t frequency) {
     // Start the update thread
     update_thread_ = std::thread([this, update_interval_ns]() {
         while (!exit_requested_) {
+            std::shared_ptr<std::map<std::string, std::unique_ptr<char>>> outputs = std::make_shared<std::map<std::string, std::unique_ptr<char>>>(); // Map to store output messages
             clock_.Reset();
             
             {
                 std::lock_guard<std::mutex> lock(state_mutex_); // Lock the mutex
 
                 // Call the user-defined update function
-                auto return_flag = on_update_function_(config_, state_);
+                auto return_flag = on_update_function_(config_, state_, outputs);
 
                 if (return_flag == false) {
                     exit_requested_ = true;
                 }
+            }
+
+            // Publish messages in outputs to the corresponding publishers
+            for (const auto& kv : *outputs) {
+                const std::string& topic_name = kv.first;
+                const auto& message = kv.second;  // Use std::vector<uint8_t> as the message type
+
+                auto it = publishers_.find(topic_name);
+                if (it != publishers_.end()) {
+                    // Create a std::unique_ptr<char> to pass to Publish
+                    std::unique_ptr<char> unique_message = std::make_unique<char>(*message);
+
+                    // Call the Publish function with the unique_ptr
+                    it->second->Publish(std::move(unique_message));
+                } else {
+                    std::cout << "Did not find a matching topic!\n";
+                }
+            }
+
+
+            // Spin subscribers
+            for (const auto& kv : subscribers_) {
+                kv.second->SpinOnce();
             }
 
             // Calculate how much time to sleep to achieve the desired update frequency
@@ -104,6 +128,19 @@ std::shared_ptr<ConfigType>& Component<ConfigType, StateType>::GetConfig() {
 template <typename ConfigType, typename StateType>
 std::shared_ptr<StateType>& Component<ConfigType, StateType>::GetState() {
     return state_;
+}
+
+template <typename ConfigType, typename StateType>
+void Component<ConfigType, StateType>::CreatePublisher(const std::string& topic_name, size_t capacity, size_t message_length) {
+    // Create and add the publisher to the vector
+    publishers_[topic_name] = std::make_shared<Publisher>(topic_name, capacity, message_length);
+}
+
+template <typename ConfigType, typename StateType>
+void Component<ConfigType, StateType>::CreateSubscriber(const std::string& topic_name, SubscriberMode mode, size_t message_length,
+    const std::function<void(std::unique_ptr<char>, size_t)>& callback) {
+    // Create and add the subscriber to the vector
+    subscribers_[topic_name] = std::make_shared<Subscriber>(topic_name, mode, message_length, callback);
 }
 
 }  // namespace component

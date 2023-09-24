@@ -6,6 +6,7 @@ Checks: >
     google-*,
     performance-*,
     -*pb.h,
+    -bugprone-easily-swappable-parameters,
 
 HeaderFilterRegex: "^(?!.*\\.pb\\.h).*"
 
