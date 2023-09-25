@@ -50,17 +50,14 @@ filegroup(
 # Generate: bazel run //:pip_vision_deps.update
 compile_pip_requirements(
     name = "pip_vision_deps",
-    timeout = "long",  # Increase timeout for underlying test
+    timeout = "eternal",  # Increase timeout for underlying test
+    size = "enormous",
     extra_args = [
         "--allow-unsafe",
         "--index-url=https://pypi.org/simple",
         "--extra-index-url=https://download.pytorch.org/whl/cu117",  # Need this for torchvision
         "--resolver=backtracking",
-
     ],
     requirements_in = "requirements.txt",
     requirements_txt = "requirements_lock.txt",
-    tags = [
-        "long_test",
-    ],
 )

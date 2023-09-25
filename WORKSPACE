@@ -139,6 +139,7 @@ PIP_EXTRA_ARGS = [
     "--require-hashes",
     "--index-url=https://pypi.org/simple",
     "--extra-index-url=https://download.pytorch.org/whl/cu117",  # This is needed for torchvision
+    "--no-cache-dir",
 ]
 
 pip_parse(
