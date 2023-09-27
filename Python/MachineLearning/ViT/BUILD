@@ -4,31 +4,24 @@ load("@pip_vision_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
+
 py_library(
-    name = "attention",
-    srcs = ["Attention.py"],
+    name = "vit",
+    srcs = ["ViT.py"],
     deps = [
         requirement("torch"),
-        requirement("numpy"),
+        "//Python/MachineLearning/Layers/Transformers:mlp"
     ],
 )
 
 py_binary(
-    name = "attention_main",
-    main = "AttentionMain.py",
-    srcs = ["AttentionMain.py"],
+    name = "train_mnist",
+    main = "TrainMnist.py",
+    srcs = ["TrainMnist.py"],
     deps = [
         requirement("torch"),
-        requirement("numpy"),
+        requirement("torchvision"),
         requirement("pytorch_lightning"),
-        ":attention"
-    ],
-)
-
-py_library(
-    name = "mlp",
-    srcs = ["MLP.py"],
-    deps = [
-        requirement("torch"),
+        ":vit"
     ],
 )
