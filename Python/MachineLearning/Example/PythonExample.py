@@ -10,9 +10,18 @@ tort, or otherwise, arising from, out of, or in connection with
 the software or the use or other dealings in the software.
 """
 
+import sys
 import torch
 
 def main() -> None:
-    print(torch)
+    """ The main funtion that prints the torch object to show it is working through Bazel
+    """
+    try:
+        print(torch)
+        return 1
+    except:
+        print("An error has occured")
+        return 0
 
-main()
+if __name__ == '__main__':
+    sys.exit(main())
